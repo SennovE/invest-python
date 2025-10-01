@@ -6,6 +6,7 @@ from typing import List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import signals_pb2, signals_pb2_grpc
 from tinkoff.invest.grpc.common import Page, PageResponse, Quotation
 from tinkoff.invest.logging import get_tracking_id_from_call, log_request
@@ -37,66 +38,66 @@ class SignalService(BaseService):
 
 @dataclass
 class GetStrategiesRequest:
-    strategy_id: Optional[str] = None
+    strategy_id: Optional[str] = message_field(1, optional=True)
 
 
 @dataclass
 class GetStrategiesResponse:
-    strategies: List['Strategy']
+    strategies: List['Strategy'] = message_field(1)
 
 
 @dataclass
 class Strategy:
-    strategy_id: str
-    strategy_name: str
-    strategy_type: 'StrategyType'
-    active_signals: int
-    total_signals: int
-    time_in_position: int
-    average_signal_yield: 'Quotation'
-    average_signal_yield_year: 'Quotation'
-    yield_: 'Quotation'
-    yield_year: 'Quotation'
-    strategy_description: Optional[str] = None
-    strategy_url: Optional[str] = None
+    strategy_id: str = message_field(1)
+    strategy_name: str = message_field(2)
+    strategy_description: Optional[str] = message_field(3, optional=True)
+    strategy_url: Optional[str] = message_field(4, optional=True)
+    strategy_type: 'StrategyType' = message_field(5)
+    active_signals: int = message_field(6)
+    total_signals: int = message_field(7)
+    time_in_position: int = message_field(8)
+    average_signal_yield: 'Quotation' = message_field(9)
+    average_signal_yield_year: 'Quotation' = message_field(10)
+    yield_: 'Quotation' = message_field(11)
+    yield_year: 'Quotation' = message_field(12)
 
 
 @dataclass
 class GetSignalsRequest:
-    signal_id: Optional[str] = None
-    strategy_id: Optional[str] = None
-    strategy_type: Optional['StrategyType'] = None
-    instrument_uid: Optional[str] = None
-    from_: Optional[datetime] = None
-    to: Optional[datetime] = None
-    direction: Optional['SignalDirection'] = None
-    active: Optional['SignalState'] = None
-    paging: Optional['Page'] = None
+    signal_id: Optional[str] = message_field(1, optional=True)
+    strategy_id: Optional[str] = message_field(2, optional=True)
+    strategy_type: Optional['StrategyType'] = message_field(3, optional=True)
+    instrument_uid: Optional[str] = message_field(4, optional=True)
+    from_: Optional[datetime] = message_field(5, optional=True)
+    to: Optional[datetime] = message_field(6, optional=True)
+    direction: Optional['SignalDirection'] = message_field(7, optional=True)
+    active: Optional['SignalState'] = message_field(8, optional=True)
+    paging: Optional['Page'] = message_field(9, optional=True)
 
 
 @dataclass
 class GetSignalsResponse:
-    signals: List['Signal']
-    paging: 'PageResponse'
+    signals: List['Signal'] = message_field(1)
+    paging: 'PageResponse' = message_field(2)
 
 
 @dataclass
 class Signal:
-    signal_id: str
-    strategy_id: str
-    strategy_name: str
-    instrument_uid: str
-    create_dt: datetime
-    direction: 'SignalDirection'
-    initial_price: 'Quotation'
-    name: str
-    target_price: 'Quotation'
-    end_dt: datetime
-    info: Optional[str] = None
-    probability: Optional[int] = None
-    stoploss: Optional['Quotation'] = None
-    close_price: Optional['Quotation'] = None
-    close_dt: Optional[datetime] = None
+    signal_id: str = message_field(1)
+    strategy_id: str = message_field(2)
+    strategy_name: str = message_field(3)
+    instrument_uid: str = message_field(4)
+    create_dt: datetime = message_field(5)
+    direction: 'SignalDirection' = message_field(6)
+    initial_price: 'Quotation' = message_field(7)
+    info: Optional[str] = message_field(8, optional=True)
+    name: str = message_field(9)
+    target_price: 'Quotation' = message_field(10)
+    end_dt: datetime = message_field(11)
+    probability: Optional[int] = message_field(12, optional=True)
+    stoploss: Optional['Quotation'] = message_field(13, optional=True)
+    close_price: Optional['Quotation'] = message_field(14, optional=True)
+    close_dt: Optional[datetime] = message_field(15, optional=True)
 
 
 class StrategyType(IntEnum):

@@ -6,6 +6,7 @@ from typing import List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import stoporders_pb2, stoporders_pb2_grpc
 from tinkoff.invest.grpc.common import (
     MoneyValue,
@@ -52,93 +53,93 @@ class StopOrdersService(BaseService):
 
 @dataclass
 class PostStopOrderRequest:
-    quantity: int
-    direction: 'StopOrderDirection'
-    account_id: str
-    expiration_type: 'StopOrderExpirationType'
-    stop_order_type: 'StopOrderType'
-    instrument_id: str
-    exchange_order_type: 'ExchangeOrderType'
-    take_profit_type: 'TakeProfitType'
-    trailing_data: 'TrailingData'
-    price_type: 'PriceType'
-    order_id: str
-    confirm_margin_trade: bool
-    figi: Optional[str] = None
-    price: Optional['Quotation'] = None
-    stop_price: Optional['Quotation'] = None
-    expire_date: Optional[datetime] = None
+    figi: Optional[str] = message_field(1, optional=True)
+    quantity: int = message_field(2)
+    price: Optional['Quotation'] = message_field(3, optional=True)
+    stop_price: Optional['Quotation'] = message_field(4, optional=True)
+    direction: 'StopOrderDirection' = message_field(5)
+    account_id: str = message_field(6)
+    expiration_type: 'StopOrderExpirationType' = message_field(7)
+    stop_order_type: 'StopOrderType' = message_field(8)
+    expire_date: Optional[datetime] = message_field(9, optional=True)
+    instrument_id: str = message_field(10)
+    exchange_order_type: 'ExchangeOrderType' = message_field(11)
+    take_profit_type: 'TakeProfitType' = message_field(12)
+    trailing_data: 'TrailingData' = message_field(13)
+    price_type: 'PriceType' = message_field(14)
+    order_id: str = message_field(15)
+    confirm_margin_trade: bool = message_field(16)
 
 
     @dataclass
     class TrailingData:
-        indent: 'Quotation'
-        indent_type: 'TrailingValueType'
-        spread: 'Quotation'
-        spread_type: 'TrailingValueType'
+        indent: 'Quotation' = message_field(1)
+        indent_type: 'TrailingValueType' = message_field(2)
+        spread: 'Quotation' = message_field(3)
+        spread_type: 'TrailingValueType' = message_field(4)
 
 
 @dataclass
 class PostStopOrderResponse:
-    stop_order_id: str
-    order_request_id: str
-    response_metadata: 'ResponseMetadata'
+    stop_order_id: str = message_field(1)
+    order_request_id: str = message_field(2)
+    response_metadata: 'ResponseMetadata' = message_field(254)
 
 
 @dataclass
 class GetStopOrdersRequest:
-    account_id: str
-    status: 'StopOrderStatusOption'
-    from_: datetime
-    to: datetime
+    account_id: str = message_field(1)
+    status: 'StopOrderStatusOption' = message_field(2)
+    from_: datetime = message_field(3)
+    to: datetime = message_field(4)
 
 
 @dataclass
 class GetStopOrdersResponse:
-    stop_orders: List['StopOrder']
+    stop_orders: List['StopOrder'] = message_field(1)
 
 
 @dataclass
 class CancelStopOrderRequest:
-    account_id: str
-    stop_order_id: str
+    account_id: str = message_field(1)
+    stop_order_id: str = message_field(2)
 
 
 @dataclass
 class CancelStopOrderResponse:
-    time: datetime
+    time: datetime = message_field(1)
 
 
 @dataclass
 class StopOrder:
-    stop_order_id: str
-    lots_requested: int
-    figi: str
-    direction: 'StopOrderDirection'
-    currency: str
-    order_type: 'StopOrderType'
-    create_date: datetime
-    activation_date_time: datetime
-    expiration_time: datetime
-    price: 'MoneyValue'
-    stop_price: 'MoneyValue'
-    instrument_uid: str
-    take_profit_type: 'TakeProfitType'
-    trailing_data: 'TrailingData'
-    status: 'StopOrderStatusOption'
-    exchange_order_type: 'ExchangeOrderType'
-    exchange_order_id: Optional[str] = None
+    stop_order_id: str = message_field(1)
+    lots_requested: int = message_field(2)
+    figi: str = message_field(3)
+    direction: 'StopOrderDirection' = message_field(4)
+    currency: str = message_field(5)
+    order_type: 'StopOrderType' = message_field(6)
+    create_date: datetime = message_field(7)
+    activation_date_time: datetime = message_field(8)
+    expiration_time: datetime = message_field(9)
+    price: 'MoneyValue' = message_field(10)
+    stop_price: 'MoneyValue' = message_field(11)
+    instrument_uid: str = message_field(12)
+    take_profit_type: 'TakeProfitType' = message_field(13)
+    trailing_data: 'TrailingData' = message_field(14)
+    status: 'StopOrderStatusOption' = message_field(15)
+    exchange_order_type: 'ExchangeOrderType' = message_field(16)
+    exchange_order_id: Optional[str] = message_field(17, optional=True)
 
 
     @dataclass
     class TrailingData:
-        indent: 'Quotation'
-        indent_type: 'TrailingValueType'
-        spread: 'Quotation'
-        spread_type: 'TrailingValueType'
-        status: 'TrailingStopStatus'
-        price: 'Quotation'
-        extr: 'Quotation'
+        indent: 'Quotation' = message_field(1)
+        indent_type: 'TrailingValueType' = message_field(2)
+        spread: 'Quotation' = message_field(3)
+        spread_type: 'TrailingValueType' = message_field(4)
+        status: 'TrailingStopStatus' = message_field(5)
+        price: 'Quotation' = message_field(7)
+        extr: 'Quotation' = message_field(8)
 
 
 class StopOrderDirection(IntEnum):

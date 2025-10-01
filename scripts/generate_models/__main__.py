@@ -6,11 +6,17 @@ from pathlib import Path
 
 from iprotopy import PackageGenerator, protos_generator
 from iprotopy.imports import ImportFrom
+from iprotopy.message_class_generator import MessageClassGenerator
+from iprotopy.one_of_generator import OneOfGenerator
 from iprotopy.service_method_generator import (
     BaseServiceMethodGenerator,
     ServiceMethodUnaryUnaryFunctionGenerator,
 )
 from iprotopy.type_mapper import TypeMapper
+
+from scripts.generate_models.message_class_field_generator import (
+    ExtendedClassFieldGenerator,
+)
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -37,6 +43,17 @@ def extended_types(origin_mapper):
                 "fixed64": "int",
             }
         )
+
+    return init
+
+
+def add_fields_helpers(origin_field_generator):
+    def init(self, *args, **kwargs):
+        origin_field_generator(self, *args, **kwargs)
+        self._class_field_generator = ExtendedClassFieldGenerator(
+            self._importer, self._type_mapper
+        )
+        self._one_of_generator = OneOfGenerator(self._class_field_generator)
 
     return init
 
@@ -104,6 +121,7 @@ def run_executable(original_run):
 if __name__ == "__main__":
     protos_generator.subprocess.run = run_executable(protos_generator.subprocess.run)
     TypeMapper.__init__ = extended_types(TypeMapper.__init__)
+    MessageClassGenerator.__init__ = add_fields_helpers(MessageClassGenerator.__init__)
     BaseServiceMethodGenerator.create = service_func_names_to_snake_case(
         BaseServiceMethodGenerator.create
     )

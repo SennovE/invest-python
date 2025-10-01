@@ -6,6 +6,7 @@ from typing import Iterable, List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import operations_pb2, operations_pb2_grpc
 from tinkoff.invest.grpc.common import (
     InstrumentType,
@@ -113,52 +114,52 @@ class OperationsStreamService(BaseService):
 
 @dataclass
 class OperationsRequest:
-    account_id: str
-    from_: Optional[datetime] = None
-    to: Optional[datetime] = None
-    state: Optional['OperationState'] = None
-    figi: Optional[str] = None
+    account_id: str = message_field(1)
+    from_: Optional[datetime] = message_field(2, optional=True)
+    to: Optional[datetime] = message_field(3, optional=True)
+    state: Optional['OperationState'] = message_field(4, optional=True)
+    figi: Optional[str] = message_field(5, optional=True)
 
 
 @dataclass
 class OperationsResponse:
-    operations: List['Operation']
+    operations: List['Operation'] = message_field(1)
 
 
 @dataclass
 class Operation:
-    id: str
-    parent_operation_id: str
-    currency: str
-    payment: 'MoneyValue'
-    price: 'MoneyValue'
-    state: 'OperationState'
-    quantity: int
-    quantity_rest: int
-    figi: str
-    instrument_type: str
-    date: datetime
-    type: str
-    operation_type: 'OperationType'
-    trades: List['OperationTrade']
-    asset_uid: str
-    position_uid: str
-    instrument_uid: str
-    child_operations: List['ChildOperationItem']
+    id: str = message_field(1)
+    parent_operation_id: str = message_field(2)
+    currency: str = message_field(3)
+    payment: 'MoneyValue' = message_field(4)
+    price: 'MoneyValue' = message_field(5)
+    state: 'OperationState' = message_field(6)
+    quantity: int = message_field(7)
+    quantity_rest: int = message_field(8)
+    figi: str = message_field(9)
+    instrument_type: str = message_field(10)
+    date: datetime = message_field(11)
+    type: str = message_field(12)
+    operation_type: 'OperationType' = message_field(13)
+    trades: List['OperationTrade'] = message_field(14)
+    asset_uid: str = message_field(16)
+    position_uid: str = message_field(17)
+    instrument_uid: str = message_field(18)
+    child_operations: List['ChildOperationItem'] = message_field(19)
 
 
 @dataclass
 class OperationTrade:
-    trade_id: str
-    date_time: datetime
-    quantity: int
-    price: 'MoneyValue'
+    trade_id: str = message_field(1)
+    date_time: datetime = message_field(2)
+    quantity: int = message_field(3)
+    price: 'MoneyValue' = message_field(4)
 
 
 @dataclass
 class PortfolioRequest:
-    account_id: str
-    currency: Optional['CurrencyRequest'] = None
+    account_id: str = message_field(1)
+    currency: Optional['CurrencyRequest'] = message_field(2, optional=True)
 
 
     class CurrencyRequest(IntEnum):
@@ -169,189 +170,191 @@ class PortfolioRequest:
 
 @dataclass
 class PortfolioResponse:
-    total_amount_shares: 'MoneyValue'
-    total_amount_bonds: 'MoneyValue'
-    total_amount_etf: 'MoneyValue'
-    total_amount_currencies: 'MoneyValue'
-    total_amount_futures: 'MoneyValue'
-    expected_yield: 'Quotation'
-    positions: List['PortfolioPosition']
-    account_id: str
-    total_amount_options: 'MoneyValue'
-    total_amount_sp: 'MoneyValue'
-    total_amount_portfolio: 'MoneyValue'
-    virtual_positions: List['VirtualPortfolioPosition']
-    daily_yield: 'MoneyValue'
-    daily_yield_relative: 'Quotation'
+    total_amount_shares: 'MoneyValue' = message_field(1)
+    total_amount_bonds: 'MoneyValue' = message_field(2)
+    total_amount_etf: 'MoneyValue' = message_field(3)
+    total_amount_currencies: 'MoneyValue' = message_field(4)
+    total_amount_futures: 'MoneyValue' = message_field(5)
+    expected_yield: 'Quotation' = message_field(6)
+    positions: List['PortfolioPosition'] = message_field(7)
+    account_id: str = message_field(8)
+    total_amount_options: 'MoneyValue' = message_field(9)
+    total_amount_sp: 'MoneyValue' = message_field(10)
+    total_amount_portfolio: 'MoneyValue' = message_field(11)
+    virtual_positions: List['VirtualPortfolioPosition'] = message_field(12)
+    daily_yield: 'MoneyValue' = message_field(15)
+    daily_yield_relative: 'Quotation' = message_field(16)
 
 
 @dataclass
 class PositionsRequest:
-    account_id: str
+    account_id: str = message_field(1)
 
 
 @dataclass
 class PositionsResponse:
-    money: List['MoneyValue']
-    blocked: List['MoneyValue']
-    securities: List['PositionsSecurities']
-    limits_loading_in_progress: bool
-    futures: List['PositionsFutures']
-    options: List['PositionsOptions']
-    account_id: str
+    money: List['MoneyValue'] = message_field(1)
+    blocked: List['MoneyValue'] = message_field(2)
+    securities: List['PositionsSecurities'] = message_field(3)
+    limits_loading_in_progress: bool = message_field(4)
+    futures: List['PositionsFutures'] = message_field(5)
+    options: List['PositionsOptions'] = message_field(6)
+    account_id: str = message_field(15)
 
 
 @dataclass
 class WithdrawLimitsRequest:
-    account_id: str
+    account_id: str = message_field(1)
 
 
 @dataclass
 class WithdrawLimitsResponse:
-    money: List['MoneyValue']
-    blocked: List['MoneyValue']
-    blocked_guarantee: List['MoneyValue']
+    money: List['MoneyValue'] = message_field(1)
+    blocked: List['MoneyValue'] = message_field(2)
+    blocked_guarantee: List['MoneyValue'] = message_field(3)
 
 
 @dataclass
 class PortfolioPosition:
-    figi: str
-    instrument_type: str
-    quantity: 'Quotation'
-    average_position_price: 'MoneyValue'
-    expected_yield: 'Quotation'
-    current_nkd: 'MoneyValue'
-    average_position_price_pt: 'Quotation'
-    current_price: 'MoneyValue'
-    average_position_price_fifo: 'MoneyValue'
-    quantity_lots: 'Quotation'
-    blocked: bool
-    blocked_lots: 'Quotation'
-    position_uid: str
-    instrument_uid: str
-    var_margin: 'MoneyValue'
-    expected_yield_fifo: 'Quotation'
-    daily_yield: 'MoneyValue'
-    ticker: str
+    figi: str = message_field(1)
+    instrument_type: str = message_field(2)
+    quantity: 'Quotation' = message_field(3)
+    average_position_price: 'MoneyValue' = message_field(4)
+    expected_yield: 'Quotation' = message_field(5)
+    current_nkd: 'MoneyValue' = message_field(6)
+    average_position_price_pt: 'Quotation' = message_field(7)
+    current_price: 'MoneyValue' = message_field(8)
+    average_position_price_fifo: 'MoneyValue' = message_field(9)
+    quantity_lots: 'Quotation' = message_field(10)
+    blocked: bool = message_field(21)
+    blocked_lots: 'Quotation' = message_field(22)
+    position_uid: str = message_field(24)
+    instrument_uid: str = message_field(25)
+    var_margin: 'MoneyValue' = message_field(26)
+    expected_yield_fifo: 'Quotation' = message_field(27)
+    daily_yield: 'MoneyValue' = message_field(31)
+    ticker: str = message_field(32)
 
 
 @dataclass
 class VirtualPortfolioPosition:
-    position_uid: str
-    instrument_uid: str
-    figi: str
-    instrument_type: str
-    quantity: 'Quotation'
-    average_position_price: 'MoneyValue'
-    expected_yield: 'Quotation'
-    expected_yield_fifo: 'Quotation'
-    expire_date: datetime
-    current_price: 'MoneyValue'
-    average_position_price_fifo: 'MoneyValue'
-    daily_yield: 'MoneyValue'
-    ticker: str
+    position_uid: str = message_field(1)
+    instrument_uid: str = message_field(2)
+    figi: str = message_field(3)
+    instrument_type: str = message_field(4)
+    quantity: 'Quotation' = message_field(5)
+    average_position_price: 'MoneyValue' = message_field(6)
+    expected_yield: 'Quotation' = message_field(7)
+    expected_yield_fifo: 'Quotation' = message_field(8)
+    expire_date: datetime = message_field(9)
+    current_price: 'MoneyValue' = message_field(10)
+    average_position_price_fifo: 'MoneyValue' = message_field(11)
+    daily_yield: 'MoneyValue' = message_field(31)
+    ticker: str = message_field(32)
 
 
 @dataclass
 class PositionsSecurities:
-    figi: str
-    blocked: int
-    balance: int
-    position_uid: str
-    instrument_uid: str
-    ticker: str
-    exchange_blocked: bool
-    instrument_type: str
+    figi: str = message_field(1)
+    blocked: int = message_field(2)
+    balance: int = message_field(3)
+    position_uid: str = message_field(4)
+    instrument_uid: str = message_field(5)
+    ticker: str = message_field(6)
+    exchange_blocked: bool = message_field(11)
+    instrument_type: str = message_field(16)
 
 
 @dataclass
 class PositionsFutures:
-    figi: str
-    blocked: int
-    balance: int
-    position_uid: str
-    instrument_uid: str
-    ticker: str
+    figi: str = message_field(1)
+    blocked: int = message_field(2)
+    balance: int = message_field(3)
+    position_uid: str = message_field(4)
+    instrument_uid: str = message_field(5)
+    ticker: str = message_field(6)
 
 
 @dataclass
 class PositionsOptions:
-    position_uid: str
-    instrument_uid: str
-    ticker: str
-    blocked: int
-    balance: int
+    position_uid: str = message_field(1)
+    instrument_uid: str = message_field(2)
+    ticker: str = message_field(3)
+    blocked: int = message_field(11)
+    balance: int = message_field(21)
 
 
 @dataclass
 class BrokerReportRequest:
     generate_broker_report_request: Optional['GenerateBrokerReportRequest'
-        ] = None
-    get_broker_report_request: Optional['GetBrokerReportRequest'] = None
+        ] = message_field(1, optional=True)
+    get_broker_report_request: Optional['GetBrokerReportRequest'
+        ] = message_field(2, optional=True)
 
 
 @dataclass
 class BrokerReportResponse:
     generate_broker_report_response: Optional['GenerateBrokerReportResponse'
-        ] = None
-    get_broker_report_response: Optional['GetBrokerReportResponse'] = None
+        ] = message_field(1, optional=True)
+    get_broker_report_response: Optional['GetBrokerReportResponse'
+        ] = message_field(2, optional=True)
 
 
 @dataclass
 class GenerateBrokerReportRequest:
-    account_id: str
-    from_: datetime
-    to: datetime
+    account_id: str = message_field(1)
+    from_: datetime = message_field(2)
+    to: datetime = message_field(3)
 
 
 @dataclass
 class GenerateBrokerReportResponse:
-    task_id: str
+    task_id: str = message_field(1)
 
 
 @dataclass
 class GetBrokerReportRequest:
-    task_id: str
-    page: Optional[int] = None
+    task_id: str = message_field(1)
+    page: Optional[int] = message_field(2, optional=True)
 
 
 @dataclass
 class GetBrokerReportResponse:
-    broker_report: List['BrokerReport']
-    itemsCount: int
-    pagesCount: int
-    page: int
+    broker_report: List['BrokerReport'] = message_field(1)
+    itemsCount: int = message_field(2)
+    pagesCount: int = message_field(3)
+    page: int = message_field(4)
 
 
 @dataclass
 class BrokerReport:
-    trade_id: str
-    order_id: str
-    figi: str
-    execute_sign: str
-    trade_datetime: datetime
-    exchange: str
-    class_code: str
-    direction: str
-    name: str
-    ticker: str
-    price: 'MoneyValue'
-    quantity: int
-    order_amount: 'MoneyValue'
-    aci_value: 'Quotation'
-    total_order_amount: 'MoneyValue'
-    broker_commission: 'MoneyValue'
-    exchange_commission: 'MoneyValue'
-    exchange_clearing_commission: 'MoneyValue'
-    repo_rate: 'Quotation'
-    party: str
-    clear_value_date: datetime
-    sec_value_date: datetime
-    broker_status: str
-    separate_agreement_type: str
-    separate_agreement_number: str
-    separate_agreement_date: str
-    delivery_type: str
+    trade_id: str = message_field(1)
+    order_id: str = message_field(2)
+    figi: str = message_field(3)
+    execute_sign: str = message_field(4)
+    trade_datetime: datetime = message_field(5)
+    exchange: str = message_field(6)
+    class_code: str = message_field(7)
+    direction: str = message_field(8)
+    name: str = message_field(9)
+    ticker: str = message_field(10)
+    price: 'MoneyValue' = message_field(11)
+    quantity: int = message_field(12)
+    order_amount: 'MoneyValue' = message_field(13)
+    aci_value: 'Quotation' = message_field(14)
+    total_order_amount: 'MoneyValue' = message_field(15)
+    broker_commission: 'MoneyValue' = message_field(16)
+    exchange_commission: 'MoneyValue' = message_field(17)
+    exchange_clearing_commission: 'MoneyValue' = message_field(18)
+    repo_rate: 'Quotation' = message_field(19)
+    party: str = message_field(20)
+    clear_value_date: datetime = message_field(21)
+    sec_value_date: datetime = message_field(22)
+    broker_status: str = message_field(23)
+    separate_agreement_type: str = message_field(24)
+    separate_agreement_number: str = message_field(25)
+    separate_agreement_date: str = message_field(26)
+    delivery_type: str = message_field(27)
 
 
 class OperationState(IntEnum):
@@ -430,85 +433,91 @@ class OperationType(IntEnum):
 @dataclass
 class GetDividendsForeignIssuerRequest:
     generate_div_foreign_issuer_report: Optional[
-        'GenerateDividendsForeignIssuerReportRequest'] = None
+        'GenerateDividendsForeignIssuerReportRequest'] = message_field(1,
+        optional=True)
     get_div_foreign_issuer_report: Optional[
-        'GetDividendsForeignIssuerReportRequest'] = None
+        'GetDividendsForeignIssuerReportRequest'] = message_field(2,
+        optional=True)
 
 
 @dataclass
 class GetDividendsForeignIssuerResponse:
     generate_div_foreign_issuer_report_response: Optional[
-        'GenerateDividendsForeignIssuerReportResponse'] = None
+        'GenerateDividendsForeignIssuerReportResponse'] = message_field(1,
+        optional=True)
     div_foreign_issuer_report: Optional[
-        'GetDividendsForeignIssuerReportResponse'] = None
+        'GetDividendsForeignIssuerReportResponse'] = message_field(2,
+        optional=True)
 
 
 @dataclass
 class GenerateDividendsForeignIssuerReportRequest:
-    account_id: str
-    from_: datetime
-    to: datetime
+    account_id: str = message_field(1)
+    from_: datetime = message_field(2)
+    to: datetime = message_field(3)
 
 
 @dataclass
 class GetDividendsForeignIssuerReportRequest:
-    task_id: str
-    page: Optional[int] = None
+    task_id: str = message_field(1)
+    page: Optional[int] = message_field(2, optional=True)
 
 
 @dataclass
 class GenerateDividendsForeignIssuerReportResponse:
-    task_id: str
+    task_id: str = message_field(1)
 
 
 @dataclass
 class GetDividendsForeignIssuerReportResponse:
-    dividends_foreign_issuer_report: List['DividendsForeignIssuerReport']
-    itemsCount: int
-    pagesCount: int
-    page: int
+    dividends_foreign_issuer_report: List['DividendsForeignIssuerReport'
+        ] = message_field(1)
+    itemsCount: int = message_field(2)
+    pagesCount: int = message_field(3)
+    page: int = message_field(4)
 
 
 @dataclass
 class DividendsForeignIssuerReport:
-    record_date: datetime
-    payment_date: datetime
-    security_name: str
-    isin: str
-    issuer_country: str
-    quantity: int
-    dividend: 'Quotation'
-    external_commission: 'Quotation'
-    dividend_gross: 'Quotation'
-    tax: 'Quotation'
-    dividend_amount: 'Quotation'
-    currency: str
+    record_date: datetime = message_field(1)
+    payment_date: datetime = message_field(2)
+    security_name: str = message_field(3)
+    isin: str = message_field(4)
+    issuer_country: str = message_field(5)
+    quantity: int = message_field(6)
+    dividend: 'Quotation' = message_field(7)
+    external_commission: 'Quotation' = message_field(8)
+    dividend_gross: 'Quotation' = message_field(9)
+    tax: 'Quotation' = message_field(10)
+    dividend_amount: 'Quotation' = message_field(11)
+    currency: str = message_field(12)
 
 
 @dataclass
 class PortfolioStreamRequest:
-    accounts: List[str]
-    ping_settings: 'PingDelaySettings'
+    accounts: List[str] = message_field(1)
+    ping_settings: 'PingDelaySettings' = message_field(15)
 
 
 @dataclass
 class PortfolioStreamResponse:
-    subscriptions: Optional['PortfolioSubscriptionResult'] = None
-    portfolio: Optional['PortfolioResponse'] = None
-    ping: Optional['Ping'] = None
+    subscriptions: Optional['PortfolioSubscriptionResult'] = message_field(
+        1, optional=True)
+    portfolio: Optional['PortfolioResponse'] = message_field(2, optional=True)
+    ping: Optional['Ping'] = message_field(3, optional=True)
 
 
 @dataclass
 class PortfolioSubscriptionResult:
-    accounts: List['AccountSubscriptionStatus']
-    tracking_id: str
-    stream_id: str
+    accounts: List['AccountSubscriptionStatus'] = message_field(1)
+    tracking_id: str = message_field(7)
+    stream_id: str = message_field(8)
 
 
 @dataclass
 class AccountSubscriptionStatus:
-    account_id: str
-    subscription_status: 'PortfolioSubscriptionStatus'
+    account_id: str = message_field(1)
+    subscription_status: 'PortfolioSubscriptionStatus' = message_field(6)
 
 
 class PortfolioSubscriptionStatus(IntEnum):
@@ -520,99 +529,102 @@ class PortfolioSubscriptionStatus(IntEnum):
 
 @dataclass
 class GetOperationsByCursorRequest:
-    account_id: str
-    operation_types: List['OperationType']
-    instrument_id: Optional[str] = None
-    from_: Optional[datetime] = None
-    to: Optional[datetime] = None
-    cursor: Optional[str] = None
-    limit: Optional[int] = None
-    state: Optional['OperationState'] = None
-    without_commissions: Optional[bool] = None
-    without_trades: Optional[bool] = None
-    without_overnights: Optional[bool] = None
+    account_id: str = message_field(1)
+    instrument_id: Optional[str] = message_field(2, optional=True)
+    from_: Optional[datetime] = message_field(6, optional=True)
+    to: Optional[datetime] = message_field(7, optional=True)
+    cursor: Optional[str] = message_field(11, optional=True)
+    limit: Optional[int] = message_field(12, optional=True)
+    operation_types: List['OperationType'] = message_field(13)
+    state: Optional['OperationState'] = message_field(14, optional=True)
+    without_commissions: Optional[bool] = message_field(15, optional=True)
+    without_trades: Optional[bool] = message_field(16, optional=True)
+    without_overnights: Optional[bool] = message_field(17, optional=True)
 
 
 @dataclass
 class GetOperationsByCursorResponse:
-    has_next: bool
-    next_cursor: str
-    items: List['OperationItem']
+    has_next: bool = message_field(1)
+    next_cursor: str = message_field(2)
+    items: List['OperationItem'] = message_field(6)
 
 
 @dataclass
 class OperationItem:
-    cursor: str
-    broker_account_id: str
-    id: str
-    parent_operation_id: str
-    name: str
-    date: datetime
-    type: 'OperationType'
-    description: str
-    state: 'OperationState'
-    instrument_uid: str
-    figi: str
-    instrument_type: str
-    instrument_kind: 'InstrumentType'
-    position_uid: str
-    payment: 'MoneyValue'
-    price: 'MoneyValue'
-    commission: 'MoneyValue'
-    yield_: 'MoneyValue'
-    yield_relative: 'Quotation'
-    accrued_int: 'MoneyValue'
-    quantity: int
-    quantity_rest: int
-    quantity_done: int
-    cancel_date_time: datetime
-    cancel_reason: str
-    trades_info: 'OperationItemTrades'
-    asset_uid: str
-    child_operations: List['ChildOperationItem']
+    cursor: str = message_field(1)
+    broker_account_id: str = message_field(6)
+    id: str = message_field(16)
+    parent_operation_id: str = message_field(17)
+    name: str = message_field(18)
+    date: datetime = message_field(21)
+    type: 'OperationType' = message_field(22)
+    description: str = message_field(23)
+    state: 'OperationState' = message_field(24)
+    instrument_uid: str = message_field(31)
+    figi: str = message_field(32)
+    instrument_type: str = message_field(33)
+    instrument_kind: 'InstrumentType' = message_field(34)
+    position_uid: str = message_field(35)
+    payment: 'MoneyValue' = message_field(41)
+    price: 'MoneyValue' = message_field(42)
+    commission: 'MoneyValue' = message_field(43)
+    yield_: 'MoneyValue' = message_field(44)
+    yield_relative: 'Quotation' = message_field(45)
+    accrued_int: 'MoneyValue' = message_field(46)
+    quantity: int = message_field(51)
+    quantity_rest: int = message_field(52)
+    quantity_done: int = message_field(53)
+    cancel_date_time: datetime = message_field(56)
+    cancel_reason: str = message_field(57)
+    trades_info: 'OperationItemTrades' = message_field(61)
+    asset_uid: str = message_field(64)
+    child_operations: List['ChildOperationItem'] = message_field(65)
 
 
 @dataclass
 class OperationItemTrades:
-    trades: List['OperationItemTrade']
+    trades: List['OperationItemTrade'] = message_field(6)
 
 
 @dataclass
 class OperationItemTrade:
-    num: str
-    date: datetime
-    quantity: int
-    price: 'MoneyValue'
-    yield_: 'MoneyValue'
-    yield_relative: 'Quotation'
+    num: str = message_field(1)
+    date: datetime = message_field(6)
+    quantity: int = message_field(11)
+    price: 'MoneyValue' = message_field(16)
+    yield_: 'MoneyValue' = message_field(21)
+    yield_relative: 'Quotation' = message_field(22)
 
 
 @dataclass
 class PositionsStreamRequest:
-    accounts: List[str]
-    with_initial_positions: bool
-    ping_settings: 'PingDelaySettings'
+    accounts: List[str] = message_field(1)
+    with_initial_positions: bool = message_field(3)
+    ping_settings: 'PingDelaySettings' = message_field(15)
 
 
 @dataclass
 class PositionsStreamResponse:
-    subscriptions: Optional['PositionsSubscriptionResult'] = None
-    position: Optional['PositionData'] = None
-    ping: Optional['Ping'] = None
-    initial_positions: Optional['PositionsResponse'] = None
+    subscriptions: Optional['PositionsSubscriptionResult'] = message_field(
+        1, optional=True)
+    position: Optional['PositionData'] = message_field(2, optional=True)
+    ping: Optional['Ping'] = message_field(3, optional=True)
+    initial_positions: Optional['PositionsResponse'] = message_field(5,
+        optional=True)
 
 
 @dataclass
 class PositionsSubscriptionResult:
-    accounts: List['PositionsSubscriptionStatus']
-    tracking_id: str
-    stream_id: str
+    accounts: List['PositionsSubscriptionStatus'] = message_field(1)
+    tracking_id: str = message_field(7)
+    stream_id: str = message_field(8)
 
 
 @dataclass
 class PositionsSubscriptionStatus:
-    account_id: str
-    subscription_status: 'PositionsAccountSubscriptionStatus'
+    account_id: str = message_field(1)
+    subscription_status: 'PositionsAccountSubscriptionStatus' = message_field(6
+        )
 
 
 class PositionsAccountSubscriptionStatus(IntEnum):
@@ -624,21 +636,21 @@ class PositionsAccountSubscriptionStatus(IntEnum):
 
 @dataclass
 class PositionData:
-    account_id: str
-    money: List['PositionsMoney']
-    securities: List['PositionsSecurities']
-    futures: List['PositionsFutures']
-    options: List['PositionsOptions']
-    date: datetime
+    account_id: str = message_field(1)
+    money: List['PositionsMoney'] = message_field(2)
+    securities: List['PositionsSecurities'] = message_field(3)
+    futures: List['PositionsFutures'] = message_field(4)
+    options: List['PositionsOptions'] = message_field(5)
+    date: datetime = message_field(6)
 
 
 @dataclass
 class PositionsMoney:
-    available_value: 'MoneyValue'
-    blocked_value: 'MoneyValue'
+    available_value: 'MoneyValue' = message_field(1)
+    blocked_value: 'MoneyValue' = message_field(2)
 
 
 @dataclass
 class ChildOperationItem:
-    instrument_uid: str
-    payment: 'MoneyValue'
+    instrument_uid: str = message_field(1)
+    payment: 'MoneyValue' = message_field(2)

@@ -6,6 +6,7 @@ from typing import Iterable, List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import marketdata_pb2, marketdata_pb2_grpc
 from tinkoff.invest.grpc.common import (
     InstrumentStatus,
@@ -128,50 +129,63 @@ class MarketDataStreamService(BaseService):
 
 @dataclass
 class MarketDataRequest:
-    subscribe_candles_request: Optional['SubscribeCandlesRequest'] = None
-    subscribe_order_book_request: Optional['SubscribeOrderBookRequest'] = None
-    subscribe_trades_request: Optional['SubscribeTradesRequest'] = None
-    subscribe_info_request: Optional['SubscribeInfoRequest'] = None
-    subscribe_last_price_request: Optional['SubscribeLastPriceRequest'] = None
-    get_my_subscriptions: Optional['GetMySubscriptions'] = None
-    ping: Optional['PingRequest'] = None
-    ping_settings: Optional['PingDelaySettings'] = None
+    subscribe_candles_request: Optional['SubscribeCandlesRequest'
+        ] = message_field(1, optional=True)
+    subscribe_order_book_request: Optional['SubscribeOrderBookRequest'
+        ] = message_field(2, optional=True)
+    subscribe_trades_request: Optional['SubscribeTradesRequest'
+        ] = message_field(3, optional=True)
+    subscribe_info_request: Optional['SubscribeInfoRequest'] = message_field(
+        4, optional=True)
+    subscribe_last_price_request: Optional['SubscribeLastPriceRequest'
+        ] = message_field(5, optional=True)
+    get_my_subscriptions: Optional['GetMySubscriptions'] = message_field(6,
+        optional=True)
+    ping: Optional['PingRequest'] = message_field(7, optional=True)
+    ping_settings: Optional['PingDelaySettings'] = message_field(15,
+        optional=True)
 
 
 @dataclass
 class MarketDataServerSideStreamRequest:
-    subscribe_candles_request: 'SubscribeCandlesRequest'
-    subscribe_order_book_request: 'SubscribeOrderBookRequest'
-    subscribe_trades_request: 'SubscribeTradesRequest'
-    subscribe_info_request: 'SubscribeInfoRequest'
-    subscribe_last_price_request: 'SubscribeLastPriceRequest'
-    ping_settings: 'PingDelaySettings'
+    subscribe_candles_request: 'SubscribeCandlesRequest' = message_field(1)
+    subscribe_order_book_request: 'SubscribeOrderBookRequest' = message_field(2
+        )
+    subscribe_trades_request: 'SubscribeTradesRequest' = message_field(3)
+    subscribe_info_request: 'SubscribeInfoRequest' = message_field(4)
+    subscribe_last_price_request: 'SubscribeLastPriceRequest' = message_field(5
+        )
+    ping_settings: 'PingDelaySettings' = message_field(15)
 
 
 @dataclass
 class MarketDataResponse:
-    subscribe_candles_response: Optional['SubscribeCandlesResponse'] = None
+    subscribe_candles_response: Optional['SubscribeCandlesResponse'
+        ] = message_field(1, optional=True)
     subscribe_order_book_response: Optional['SubscribeOrderBookResponse'
-        ] = None
-    subscribe_trades_response: Optional['SubscribeTradesResponse'] = None
-    subscribe_info_response: Optional['SubscribeInfoResponse'] = None
-    candle: Optional['Candle'] = None
-    trade: Optional['Trade'] = None
-    orderbook: Optional['OrderBook'] = None
-    trading_status: Optional['TradingStatus'] = None
-    ping: Optional['Ping'] = None
+        ] = message_field(2, optional=True)
+    subscribe_trades_response: Optional['SubscribeTradesResponse'
+        ] = message_field(3, optional=True)
+    subscribe_info_response: Optional['SubscribeInfoResponse'] = message_field(
+        4, optional=True)
+    candle: Optional['Candle'] = message_field(5, optional=True)
+    trade: Optional['Trade'] = message_field(6, optional=True)
+    orderbook: Optional['OrderBook'] = message_field(7, optional=True)
+    trading_status: Optional['TradingStatus'] = message_field(8, optional=True)
+    ping: Optional['Ping'] = message_field(9, optional=True)
     subscribe_last_price_response: Optional['SubscribeLastPriceResponse'
-        ] = None
-    last_price: Optional['LastPrice'] = None
-    open_interest: Optional['OpenInterest'] = None
+        ] = message_field(10, optional=True)
+    last_price: Optional['LastPrice'] = message_field(11, optional=True)
+    open_interest: Optional['OpenInterest'] = message_field(12, optional=True)
 
 
 @dataclass
 class SubscribeCandlesRequest:
-    subscription_action: 'SubscriptionAction'
-    instruments: List['CandleInstrument']
-    waiting_close: bool
-    candle_source_type: Optional['GetCandlesRequest.CandleSource'] = None
+    subscription_action: 'SubscriptionAction' = message_field(1)
+    instruments: List['CandleInstrument'] = message_field(2)
+    waiting_close: bool = message_field(3)
+    candle_source_type: Optional['GetCandlesRequest.CandleSource'
+        ] = message_field(9, optional=True)
 
 
 class SubscriptionAction(IntEnum):
@@ -199,28 +213,29 @@ class SubscriptionInterval(IntEnum):
 
 @dataclass
 class CandleInstrument:
-    figi: str
-    interval: 'SubscriptionInterval'
-    instrument_id: str
+    figi: str = message_field(1)
+    interval: 'SubscriptionInterval' = message_field(2)
+    instrument_id: str = message_field(3)
 
 
 @dataclass
 class SubscribeCandlesResponse:
-    tracking_id: str
-    candles_subscriptions: List['CandleSubscription']
+    tracking_id: str = message_field(1)
+    candles_subscriptions: List['CandleSubscription'] = message_field(2)
 
 
 @dataclass
 class CandleSubscription:
-    figi: str
-    interval: 'SubscriptionInterval'
-    subscription_status: 'SubscriptionStatus'
-    instrument_uid: str
-    waiting_close: bool
-    stream_id: str
-    subscription_id: str
-    subscription_action: 'SubscriptionAction'
-    candle_source_type: Optional['GetCandlesRequest.CandleSource'] = None
+    figi: str = message_field(1)
+    interval: 'SubscriptionInterval' = message_field(2)
+    subscription_status: 'SubscriptionStatus' = message_field(3)
+    instrument_uid: str = message_field(4)
+    waiting_close: bool = message_field(5)
+    stream_id: str = message_field(6)
+    subscription_id: str = message_field(7)
+    subscription_action: 'SubscriptionAction' = message_field(8)
+    candle_source_type: Optional['GetCandlesRequest.CandleSource'
+        ] = message_field(9, optional=True)
 
 
 class SubscriptionStatus(IntEnum):
@@ -239,34 +254,34 @@ class SubscriptionStatus(IntEnum):
 
 @dataclass
 class SubscribeOrderBookRequest:
-    subscription_action: 'SubscriptionAction'
-    instruments: List['OrderBookInstrument']
+    subscription_action: 'SubscriptionAction' = message_field(1)
+    instruments: List['OrderBookInstrument'] = message_field(2)
 
 
 @dataclass
 class OrderBookInstrument:
-    figi: str
-    depth: int
-    instrument_id: str
-    order_book_type: 'OrderBookType'
+    figi: str = message_field(1)
+    depth: int = message_field(2)
+    instrument_id: str = message_field(3)
+    order_book_type: 'OrderBookType' = message_field(4)
 
 
 @dataclass
 class SubscribeOrderBookResponse:
-    tracking_id: str
-    order_book_subscriptions: List['OrderBookSubscription']
+    tracking_id: str = message_field(1)
+    order_book_subscriptions: List['OrderBookSubscription'] = message_field(2)
 
 
 @dataclass
 class OrderBookSubscription:
-    figi: str
-    depth: int
-    subscription_status: 'SubscriptionStatus'
-    instrument_uid: str
-    stream_id: str
-    subscription_id: str
-    order_book_type: 'OrderBookType'
-    subscription_action: 'SubscriptionAction'
+    figi: str = message_field(1)
+    depth: int = message_field(2)
+    subscription_status: 'SubscriptionStatus' = message_field(3)
+    instrument_uid: str = message_field(4)
+    stream_id: str = message_field(5)
+    subscription_id: str = message_field(6)
+    order_book_type: 'OrderBookType' = message_field(7)
+    subscription_action: 'SubscriptionAction' = message_field(8)
 
 
 class TradeSourceType(IntEnum):
@@ -278,136 +293,136 @@ class TradeSourceType(IntEnum):
 
 @dataclass
 class SubscribeTradesRequest:
-    subscription_action: 'SubscriptionAction'
-    instruments: List['TradeInstrument']
-    trade_source: 'TradeSourceType'
-    with_open_interest: bool
+    subscription_action: 'SubscriptionAction' = message_field(1)
+    instruments: List['TradeInstrument'] = message_field(2)
+    trade_source: 'TradeSourceType' = message_field(3)
+    with_open_interest: bool = message_field(4)
 
 
 @dataclass
 class TradeInstrument:
-    figi: str
-    instrument_id: str
+    figi: str = message_field(1)
+    instrument_id: str = message_field(2)
 
 
 @dataclass
 class SubscribeTradesResponse:
-    tracking_id: str
-    trade_subscriptions: List['TradeSubscription']
-    trade_source: 'TradeSourceType'
+    tracking_id: str = message_field(1)
+    trade_subscriptions: List['TradeSubscription'] = message_field(2)
+    trade_source: 'TradeSourceType' = message_field(3)
 
 
 @dataclass
 class TradeSubscription:
-    figi: str
-    subscription_status: 'SubscriptionStatus'
-    instrument_uid: str
-    stream_id: str
-    subscription_id: str
-    with_open_interest: bool
-    subscription_action: 'SubscriptionAction'
+    figi: str = message_field(1)
+    subscription_status: 'SubscriptionStatus' = message_field(2)
+    instrument_uid: str = message_field(3)
+    stream_id: str = message_field(4)
+    subscription_id: str = message_field(5)
+    with_open_interest: bool = message_field(6)
+    subscription_action: 'SubscriptionAction' = message_field(7)
 
 
 @dataclass
 class SubscribeInfoRequest:
-    subscription_action: 'SubscriptionAction'
-    instruments: List['InfoInstrument']
+    subscription_action: 'SubscriptionAction' = message_field(1)
+    instruments: List['InfoInstrument'] = message_field(2)
 
 
 @dataclass
 class InfoInstrument:
-    figi: str
-    instrument_id: str
+    figi: str = message_field(1)
+    instrument_id: str = message_field(2)
 
 
 @dataclass
 class SubscribeInfoResponse:
-    tracking_id: str
-    info_subscriptions: List['InfoSubscription']
+    tracking_id: str = message_field(1)
+    info_subscriptions: List['InfoSubscription'] = message_field(2)
 
 
 @dataclass
 class InfoSubscription:
-    figi: str
-    subscription_status: 'SubscriptionStatus'
-    instrument_uid: str
-    stream_id: str
-    subscription_id: str
-    subscription_action: 'SubscriptionAction'
+    figi: str = message_field(1)
+    subscription_status: 'SubscriptionStatus' = message_field(2)
+    instrument_uid: str = message_field(3)
+    stream_id: str = message_field(4)
+    subscription_id: str = message_field(5)
+    subscription_action: 'SubscriptionAction' = message_field(6)
 
 
 @dataclass
 class SubscribeLastPriceRequest:
-    subscription_action: 'SubscriptionAction'
-    instruments: List['LastPriceInstrument']
+    subscription_action: 'SubscriptionAction' = message_field(1)
+    instruments: List['LastPriceInstrument'] = message_field(2)
 
 
 @dataclass
 class LastPriceInstrument:
-    figi: str
-    instrument_id: str
+    figi: str = message_field(1)
+    instrument_id: str = message_field(2)
 
 
 @dataclass
 class SubscribeLastPriceResponse:
-    tracking_id: str
-    last_price_subscriptions: List['LastPriceSubscription']
+    tracking_id: str = message_field(1)
+    last_price_subscriptions: List['LastPriceSubscription'] = message_field(2)
 
 
 @dataclass
 class LastPriceSubscription:
-    figi: str
-    subscription_status: 'SubscriptionStatus'
-    instrument_uid: str
-    stream_id: str
-    subscription_id: str
-    subscription_action: 'SubscriptionAction'
+    figi: str = message_field(1)
+    subscription_status: 'SubscriptionStatus' = message_field(2)
+    instrument_uid: str = message_field(3)
+    stream_id: str = message_field(4)
+    subscription_id: str = message_field(5)
+    subscription_action: 'SubscriptionAction' = message_field(6)
 
 
 @dataclass
 class Candle:
-    figi: str
-    interval: 'SubscriptionInterval'
-    open: 'Quotation'
-    high: 'Quotation'
-    low: 'Quotation'
-    close: 'Quotation'
-    volume: int
-    time: datetime
-    last_trade_ts: datetime
-    instrument_uid: str
-    candle_source_type: 'CandleSource'
+    figi: str = message_field(1)
+    interval: 'SubscriptionInterval' = message_field(2)
+    open: 'Quotation' = message_field(3)
+    high: 'Quotation' = message_field(4)
+    low: 'Quotation' = message_field(5)
+    close: 'Quotation' = message_field(6)
+    volume: int = message_field(7)
+    time: datetime = message_field(8)
+    last_trade_ts: datetime = message_field(9)
+    instrument_uid: str = message_field(10)
+    candle_source_type: 'CandleSource' = message_field(19)
 
 
 @dataclass
 class OrderBook:
-    figi: str
-    depth: int
-    is_consistent: bool
-    bids: List['Order']
-    asks: List['Order']
-    time: datetime
-    limit_up: 'Quotation'
-    limit_down: 'Quotation'
-    instrument_uid: str
-    order_book_type: 'OrderBookType'
+    figi: str = message_field(1)
+    depth: int = message_field(2)
+    is_consistent: bool = message_field(3)
+    bids: List['Order'] = message_field(4)
+    asks: List['Order'] = message_field(5)
+    time: datetime = message_field(6)
+    limit_up: 'Quotation' = message_field(7)
+    limit_down: 'Quotation' = message_field(8)
+    instrument_uid: str = message_field(9)
+    order_book_type: 'OrderBookType' = message_field(10)
 
 
 @dataclass
 class Order:
-    price: 'Quotation'
-    quantity: int
+    price: 'Quotation' = message_field(1)
+    quantity: int = message_field(2)
 
 
 @dataclass
 class Trade:
-    figi: str
-    direction: 'TradeDirection'
-    price: 'Quotation'
-    quantity: int
-    time: datetime
-    instrument_uid: str
-    trade_source: 'TradeSourceType'
+    figi: str = message_field(1)
+    direction: 'TradeDirection' = message_field(2)
+    price: 'Quotation' = message_field(3)
+    quantity: int = message_field(4)
+    time: datetime = message_field(5)
+    instrument_uid: str = message_field(6)
+    trade_source: 'TradeSourceType' = message_field(7)
 
 
 class TradeDirection(IntEnum):
@@ -418,23 +433,24 @@ class TradeDirection(IntEnum):
 
 @dataclass
 class TradingStatus:
-    figi: str
-    trading_status: 'SecurityTradingStatus'
-    time: datetime
-    limit_order_available_flag: bool
-    market_order_available_flag: bool
-    instrument_uid: str
+    figi: str = message_field(1)
+    trading_status: 'SecurityTradingStatus' = message_field(2)
+    time: datetime = message_field(3)
+    limit_order_available_flag: bool = message_field(4)
+    market_order_available_flag: bool = message_field(5)
+    instrument_uid: str = message_field(6)
 
 
 @dataclass
 class GetCandlesRequest:
-    from_: datetime
-    to: datetime
-    interval: 'CandleInterval'
-    figi: Optional[str] = None
-    instrument_id: Optional[str] = None
-    candle_source_type: Optional['CandleSource'] = None
-    limit: Optional[int] = None
+    figi: Optional[str] = message_field(1, optional=True)
+    from_: datetime = message_field(2)
+    to: datetime = message_field(3)
+    interval: 'CandleInterval' = message_field(4)
+    instrument_id: Optional[str] = message_field(5, optional=True)
+    candle_source_type: Optional['CandleSource'] = message_field(7,
+        optional=True)
+    limit: Optional[int] = message_field(10, optional=True)
 
 
     class CandleSource(IntEnum):
@@ -471,113 +487,114 @@ class CandleSource(IntEnum):
 
 @dataclass
 class GetCandlesResponse:
-    candles: List['HistoricCandle']
+    candles: List['HistoricCandle'] = message_field(1)
 
 
 @dataclass
 class HistoricCandle:
-    open: 'Quotation'
-    high: 'Quotation'
-    low: 'Quotation'
-    close: 'Quotation'
-    volume: int
-    time: datetime
-    is_complete: bool
-    candle_source: 'CandleSource'
+    open: 'Quotation' = message_field(1)
+    high: 'Quotation' = message_field(2)
+    low: 'Quotation' = message_field(3)
+    close: 'Quotation' = message_field(4)
+    volume: int = message_field(5)
+    time: datetime = message_field(6)
+    is_complete: bool = message_field(7)
+    candle_source: 'CandleSource' = message_field(9)
 
 
 @dataclass
 class GetLastPricesRequest:
-    figi: List[str]
-    instrument_id: List[str]
-    last_price_type: 'LastPriceType'
-    instrument_status: Optional['InstrumentStatus'] = None
+    figi: List[str] = message_field(1)
+    instrument_id: List[str] = message_field(2)
+    last_price_type: 'LastPriceType' = message_field(3)
+    instrument_status: Optional['InstrumentStatus'] = message_field(9,
+        optional=True)
 
 
 @dataclass
 class GetLastPricesResponse:
-    last_prices: List['LastPrice']
+    last_prices: List['LastPrice'] = message_field(1)
 
 
 @dataclass
 class LastPrice:
-    figi: str
-    price: 'Quotation'
-    time: datetime
-    instrument_uid: str
-    last_price_type: 'LastPriceType'
+    figi: str = message_field(1)
+    price: 'Quotation' = message_field(2)
+    time: datetime = message_field(3)
+    instrument_uid: str = message_field(11)
+    last_price_type: 'LastPriceType' = message_field(12)
 
 
 @dataclass
 class OpenInterest:
-    instrument_uid: str
-    time: datetime
-    open_interest: int
+    instrument_uid: str = message_field(1)
+    time: datetime = message_field(2)
+    open_interest: int = message_field(3)
 
 
 @dataclass
 class GetOrderBookRequest:
-    depth: int
-    figi: Optional[str] = None
-    instrument_id: Optional[str] = None
+    figi: Optional[str] = message_field(1, optional=True)
+    depth: int = message_field(2)
+    instrument_id: Optional[str] = message_field(3, optional=True)
 
 
 @dataclass
 class GetOrderBookResponse:
-    figi: str
-    depth: int
-    bids: List['Order']
-    asks: List['Order']
-    last_price: 'Quotation'
-    close_price: 'Quotation'
-    limit_up: 'Quotation'
-    limit_down: 'Quotation'
-    last_price_ts: datetime
-    close_price_ts: datetime
-    orderbook_ts: datetime
-    instrument_uid: str
+    figi: str = message_field(1)
+    depth: int = message_field(2)
+    bids: List['Order'] = message_field(3)
+    asks: List['Order'] = message_field(4)
+    last_price: 'Quotation' = message_field(5)
+    close_price: 'Quotation' = message_field(6)
+    limit_up: 'Quotation' = message_field(7)
+    limit_down: 'Quotation' = message_field(8)
+    last_price_ts: datetime = message_field(21)
+    close_price_ts: datetime = message_field(22)
+    orderbook_ts: datetime = message_field(23)
+    instrument_uid: str = message_field(9)
 
 
 @dataclass
 class GetTradingStatusRequest:
-    figi: Optional[str] = None
-    instrument_id: Optional[str] = None
+    figi: Optional[str] = message_field(1, optional=True)
+    instrument_id: Optional[str] = message_field(2, optional=True)
 
 
 @dataclass
 class GetTradingStatusesRequest:
-    instrument_id: List[str]
+    instrument_id: List[str] = message_field(1)
 
 
 @dataclass
 class GetTradingStatusesResponse:
-    trading_statuses: List['GetTradingStatusResponse']
+    trading_statuses: List['GetTradingStatusResponse'] = message_field(1)
 
 
 @dataclass
 class GetTradingStatusResponse:
-    figi: str
-    trading_status: 'SecurityTradingStatus'
-    limit_order_available_flag: bool
-    market_order_available_flag: bool
-    api_trade_available_flag: bool
-    instrument_uid: str
-    bestprice_order_available_flag: bool
-    only_best_price: bool
+    figi: str = message_field(1)
+    trading_status: 'SecurityTradingStatus' = message_field(2)
+    limit_order_available_flag: bool = message_field(3)
+    market_order_available_flag: bool = message_field(4)
+    api_trade_available_flag: bool = message_field(5)
+    instrument_uid: str = message_field(6)
+    bestprice_order_available_flag: bool = message_field(8)
+    only_best_price: bool = message_field(9)
 
 
 @dataclass
 class GetLastTradesRequest:
-    from_: datetime
-    to: datetime
-    trade_source: 'TradeSourceType'
-    figi: Optional[str] = None
-    instrument_id: Optional[str] = None
+    figi: Optional[str] = message_field(1, optional=True)
+    from_: datetime = message_field(2)
+    to: datetime = message_field(3)
+    instrument_id: Optional[str] = message_field(4, optional=True)
+    trade_source: 'TradeSourceType' = message_field(5)
 
 
 @dataclass
 class GetLastTradesResponse:
-    trades: List['Trade']
+    trades: List['Trade'] = message_field(1)
 
 
 @dataclass
@@ -587,53 +604,54 @@ class GetMySubscriptions:
 
 @dataclass
 class GetClosePricesRequest:
-    instruments: List['InstrumentClosePriceRequest']
-    instrument_status: Optional['InstrumentStatus'] = None
+    instruments: List['InstrumentClosePriceRequest'] = message_field(1)
+    instrument_status: Optional['InstrumentStatus'] = message_field(9,
+        optional=True)
 
 
 @dataclass
 class InstrumentClosePriceRequest:
-    instrument_id: str
+    instrument_id: str = message_field(1)
 
 
 @dataclass
 class GetClosePricesResponse:
-    close_prices: List['InstrumentClosePriceResponse']
+    close_prices: List['InstrumentClosePriceResponse'] = message_field(1)
 
 
 @dataclass
 class InstrumentClosePriceResponse:
-    figi: str
-    instrument_uid: str
-    price: 'Quotation'
-    evening_session_price: 'Quotation'
-    time: datetime
-    evening_session_price_time: datetime
+    figi: str = message_field(1)
+    instrument_uid: str = message_field(2)
+    price: 'Quotation' = message_field(11)
+    evening_session_price: 'Quotation' = message_field(12)
+    time: datetime = message_field(21)
+    evening_session_price_time: datetime = message_field(23)
 
 
 @dataclass
 class GetTechAnalysisRequest:
-    indicator_type: 'IndicatorType'
-    instrument_uid: str
-    from_: datetime
-    to: datetime
-    interval: 'IndicatorInterval'
-    type_of_price: 'TypeOfPrice'
-    length: int
-    deviation: 'Deviation'
-    smoothing: 'Smoothing'
+    indicator_type: 'IndicatorType' = message_field(1)
+    instrument_uid: str = message_field(2)
+    from_: datetime = message_field(3)
+    to: datetime = message_field(4)
+    interval: 'IndicatorInterval' = message_field(5)
+    type_of_price: 'TypeOfPrice' = message_field(6)
+    length: int = message_field(7)
+    deviation: 'Deviation' = message_field(8)
+    smoothing: 'Smoothing' = message_field(9)
 
 
     @dataclass
     class Smoothing:
-        fast_length: int
-        slow_length: int
-        signal_smoothing: int
+        fast_length: int = message_field(1)
+        slow_length: int = message_field(2)
+        signal_smoothing: int = message_field(3)
 
 
     @dataclass
     class Deviation:
-        deviation_multiplier: 'Quotation'
+        deviation_multiplier: 'Quotation' = message_field(1)
 
 
     class IndicatorInterval(IntEnum):
@@ -673,41 +691,41 @@ class GetTechAnalysisRequest:
 
 @dataclass
 class GetTechAnalysisResponse:
-    technical_indicators: List['TechAnalysisItem']
+    technical_indicators: List['TechAnalysisItem'] = message_field(1)
 
 
     @dataclass
     class TechAnalysisItem:
-        timestamp: datetime
-        middle_band: Optional['Quotation'] = None
-        upper_band: Optional['Quotation'] = None
-        lower_band: Optional['Quotation'] = None
-        signal: Optional['Quotation'] = None
-        macd: Optional['Quotation'] = None
+        timestamp: datetime = message_field(1)
+        middle_band: Optional['Quotation'] = message_field(2, optional=True)
+        upper_band: Optional['Quotation'] = message_field(3, optional=True)
+        lower_band: Optional['Quotation'] = message_field(4, optional=True)
+        signal: Optional['Quotation'] = message_field(5, optional=True)
+        macd: Optional['Quotation'] = message_field(6, optional=True)
 
 
 @dataclass
 class GetMarketValuesRequest:
-    instrument_id: List[str]
-    values: List['MarketValueType']
+    instrument_id: List[str] = message_field(1)
+    values: List['MarketValueType'] = message_field(2)
 
 
 @dataclass
 class GetMarketValuesResponse:
-    instruments: List['MarketValueInstrument']
+    instruments: List['MarketValueInstrument'] = message_field(1)
 
 
 @dataclass
 class MarketValueInstrument:
-    instrument_uid: str
-    values: List['MarketValue']
+    instrument_uid: str = message_field(1)
+    values: List['MarketValue'] = message_field(2)
 
 
 @dataclass
 class MarketValue:
-    type: Optional['MarketValueType'] = None
-    value: Optional['Quotation'] = None
-    time: Optional[datetime] = None
+    type: Optional['MarketValueType'] = message_field(1, optional=True)
+    value: Optional['Quotation'] = message_field(2, optional=True)
+    time: Optional[datetime] = message_field(3, optional=True)
 
 
 class MarketValueType(IntEnum):

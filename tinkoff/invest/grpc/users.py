@@ -6,6 +6,7 @@ from typing import List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import users_pb2, users_pb2_grpc
 from tinkoff.invest.grpc.common import MoneyValue, Quotation
 from tinkoff.invest.logging import get_tracking_id_from_call, log_request
@@ -56,23 +57,23 @@ class UsersService(BaseService):
 
 @dataclass
 class GetAccountsRequest:
-    status: Optional['AccountStatus'] = None
+    status: Optional['AccountStatus'] = message_field(1, optional=True)
 
 
 @dataclass
 class GetAccountsResponse:
-    accounts: List['Account']
+    accounts: List['Account'] = message_field(1)
 
 
 @dataclass
 class Account:
-    id: str
-    type: 'AccountType'
-    name: str
-    status: 'AccountStatus'
-    opened_date: datetime
-    closed_date: datetime
-    access_level: 'AccessLevel'
+    id: str = message_field(1)
+    type: 'AccountType' = message_field(2)
+    name: str = message_field(3)
+    status: 'AccountStatus' = message_field(4)
+    opened_date: datetime = message_field(5)
+    closed_date: datetime = message_field(6)
+    access_level: 'AccessLevel' = message_field(7)
 
 
 class AccountType(IntEnum):
@@ -93,17 +94,17 @@ class AccountStatus(IntEnum):
 
 @dataclass
 class GetMarginAttributesRequest:
-    account_id: str
+    account_id: str = message_field(1)
 
 
 @dataclass
 class GetMarginAttributesResponse:
-    liquid_portfolio: 'MoneyValue'
-    starting_margin: 'MoneyValue'
-    minimal_margin: 'MoneyValue'
-    funds_sufficiency_level: 'Quotation'
-    amount_of_missing_funds: 'MoneyValue'
-    corrected_margin: 'MoneyValue'
+    liquid_portfolio: 'MoneyValue' = message_field(1)
+    starting_margin: 'MoneyValue' = message_field(2)
+    minimal_margin: 'MoneyValue' = message_field(3)
+    funds_sufficiency_level: 'Quotation' = message_field(4)
+    amount_of_missing_funds: 'MoneyValue' = message_field(5)
+    corrected_margin: 'MoneyValue' = message_field(6)
 
 
 @dataclass
@@ -113,21 +114,21 @@ class GetUserTariffRequest:
 
 @dataclass
 class GetUserTariffResponse:
-    unary_limits: List['UnaryLimit']
-    stream_limits: List['StreamLimit']
+    unary_limits: List['UnaryLimit'] = message_field(1)
+    stream_limits: List['StreamLimit'] = message_field(2)
 
 
 @dataclass
 class UnaryLimit:
-    limit_per_minute: int
-    methods: List[str]
+    limit_per_minute: int = message_field(1)
+    methods: List[str] = message_field(2)
 
 
 @dataclass
 class StreamLimit:
-    limit: int
-    streams: List[str]
-    open: int
+    limit: int = message_field(1)
+    streams: List[str] = message_field(2)
+    open: int = message_field(3)
 
 
 @dataclass
@@ -137,12 +138,12 @@ class GetInfoRequest:
 
 @dataclass
 class GetInfoResponse:
-    prem_status: bool
-    qual_status: bool
-    qualified_for_work_with: List[str]
-    tariff: str
-    user_id: str
-    risk_level_code: str
+    prem_status: bool = message_field(1)
+    qual_status: bool = message_field(2)
+    qualified_for_work_with: List[str] = message_field(3)
+    tariff: str = message_field(4)
+    user_id: str = message_field(9)
+    risk_level_code: str = message_field(12)
 
 
 class AccessLevel(IntEnum):

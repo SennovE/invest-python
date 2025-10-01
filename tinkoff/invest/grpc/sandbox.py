@@ -4,6 +4,7 @@ from typing import Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import sandbox_pb2, sandbox_pb2_grpc
 from tinkoff.invest.grpc.common import MoneyValue
 from tinkoff.invest.grpc.operations import (
@@ -192,17 +193,17 @@ class SandboxService(BaseService):
 
 @dataclass
 class OpenSandboxAccountRequest:
-    name: Optional[str] = None
+    name: Optional[str] = message_field(1, optional=True)
 
 
 @dataclass
 class OpenSandboxAccountResponse:
-    account_id: str
+    account_id: str = message_field(1)
 
 
 @dataclass
 class CloseSandboxAccountRequest:
-    account_id: str
+    account_id: str = message_field(1)
 
 
 @dataclass
@@ -212,10 +213,10 @@ class CloseSandboxAccountResponse:
 
 @dataclass
 class SandboxPayInRequest:
-    account_id: str
-    amount: 'MoneyValue'
+    account_id: str = message_field(1)
+    amount: 'MoneyValue' = message_field(2)
 
 
 @dataclass
 class SandboxPayInResponse:
-    balance: 'MoneyValue'
+    balance: 'MoneyValue' = message_field(1)

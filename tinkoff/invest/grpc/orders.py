@@ -6,6 +6,7 @@ from typing import Iterable, List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import orders_pb2, orders_pb2_grpc
 from tinkoff.invest.grpc.common import (
     ErrorDetail,
@@ -120,289 +121,295 @@ class OrdersService(BaseService):
 
 @dataclass
 class TradesStreamRequest:
-    accounts: List[str]
-    ping_delay_ms: Optional[int] = None
+    accounts: List[str] = message_field(1)
+    ping_delay_ms: Optional[int] = message_field(15, optional=True)
 
 
 @dataclass
 class TradesStreamResponse:
-    order_trades: Optional['OrderTrades'] = None
-    ping: Optional['Ping'] = None
-    subscription: Optional['SubscriptionResponse'] = None
+    order_trades: Optional['OrderTrades'] = message_field(1, optional=True)
+    ping: Optional['Ping'] = message_field(2, optional=True)
+    subscription: Optional['SubscriptionResponse'] = message_field(3,
+        optional=True)
 
 
 @dataclass
 class OrderTrades:
-    order_id: str
-    created_at: datetime
-    direction: 'OrderDirection'
-    figi: str
-    trades: List['OrderTrade']
-    account_id: str
-    instrument_uid: str
+    order_id: str = message_field(1)
+    created_at: datetime = message_field(2)
+    direction: 'OrderDirection' = message_field(3)
+    figi: str = message_field(4)
+    trades: List['OrderTrade'] = message_field(5)
+    account_id: str = message_field(6)
+    instrument_uid: str = message_field(7)
 
 
 @dataclass
 class OrderTrade:
-    date_time: datetime
-    price: 'Quotation'
-    quantity: int
-    trade_id: str
+    date_time: datetime = message_field(1)
+    price: 'Quotation' = message_field(2)
+    quantity: int = message_field(3)
+    trade_id: str = message_field(4)
 
 
 @dataclass
 class PostOrderRequest:
-    quantity: int
-    direction: 'OrderDirection'
-    account_id: str
-    order_type: 'OrderType'
-    order_id: str
-    instrument_id: str
-    time_in_force: 'TimeInForceType'
-    price_type: 'PriceType'
-    confirm_margin_trade: bool
-    figi: Optional[str] = None
-    price: Optional['Quotation'] = None
+    figi: Optional[str] = message_field(1, optional=True)
+    quantity: int = message_field(2)
+    price: Optional['Quotation'] = message_field(3, optional=True)
+    direction: 'OrderDirection' = message_field(4)
+    account_id: str = message_field(5)
+    order_type: 'OrderType' = message_field(6)
+    order_id: str = message_field(7)
+    instrument_id: str = message_field(8)
+    time_in_force: 'TimeInForceType' = message_field(9)
+    price_type: 'PriceType' = message_field(10)
+    confirm_margin_trade: bool = message_field(11)
 
 
 @dataclass
 class PostOrderResponse:
-    order_id: str
-    execution_report_status: 'OrderExecutionReportStatus'
-    lots_requested: int
-    lots_executed: int
-    initial_order_price: 'MoneyValue'
-    executed_order_price: 'MoneyValue'
-    total_order_amount: 'MoneyValue'
-    initial_commission: 'MoneyValue'
-    executed_commission: 'MoneyValue'
-    aci_value: 'MoneyValue'
-    figi: str
-    direction: 'OrderDirection'
-    initial_security_price: 'MoneyValue'
-    order_type: 'OrderType'
-    message: str
-    initial_order_price_pt: 'Quotation'
-    instrument_uid: str
-    order_request_id: str
-    response_metadata: 'ResponseMetadata'
+    order_id: str = message_field(1)
+    execution_report_status: 'OrderExecutionReportStatus' = message_field(2)
+    lots_requested: int = message_field(3)
+    lots_executed: int = message_field(4)
+    initial_order_price: 'MoneyValue' = message_field(5)
+    executed_order_price: 'MoneyValue' = message_field(6)
+    total_order_amount: 'MoneyValue' = message_field(7)
+    initial_commission: 'MoneyValue' = message_field(8)
+    executed_commission: 'MoneyValue' = message_field(9)
+    aci_value: 'MoneyValue' = message_field(10)
+    figi: str = message_field(11)
+    direction: 'OrderDirection' = message_field(12)
+    initial_security_price: 'MoneyValue' = message_field(13)
+    order_type: 'OrderType' = message_field(14)
+    message: str = message_field(15)
+    initial_order_price_pt: 'Quotation' = message_field(16)
+    instrument_uid: str = message_field(17)
+    order_request_id: str = message_field(20)
+    response_metadata: 'ResponseMetadata' = message_field(254)
 
 
 @dataclass
 class PostOrderAsyncRequest:
-    instrument_id: str
-    quantity: int
-    direction: 'OrderDirection'
-    account_id: str
-    order_type: 'OrderType'
-    order_id: str
-    confirm_margin_trade: bool
-    price: Optional['Quotation'] = None
-    time_in_force: Optional['TimeInForceType'] = None
-    price_type: Optional['PriceType'] = None
+    instrument_id: str = message_field(1)
+    quantity: int = message_field(2)
+    price: Optional['Quotation'] = message_field(3, optional=True)
+    direction: 'OrderDirection' = message_field(4)
+    account_id: str = message_field(5)
+    order_type: 'OrderType' = message_field(6)
+    order_id: str = message_field(7)
+    time_in_force: Optional['TimeInForceType'] = message_field(8, optional=True
+        )
+    price_type: Optional['PriceType'] = message_field(9, optional=True)
+    confirm_margin_trade: bool = message_field(10)
 
 
 @dataclass
 class PostOrderAsyncResponse:
-    order_request_id: str
-    execution_report_status: 'OrderExecutionReportStatus'
-    trade_intent_id: Optional[str] = None
+    order_request_id: str = message_field(1)
+    execution_report_status: 'OrderExecutionReportStatus' = message_field(2)
+    trade_intent_id: Optional[str] = message_field(3, optional=True)
 
 
 @dataclass
 class CancelOrderRequest:
-    account_id: str
-    order_id: str
-    order_id_type: Optional['OrderIdType'] = None
+    account_id: str = message_field(1)
+    order_id: str = message_field(2)
+    order_id_type: Optional['OrderIdType'] = message_field(3, optional=True)
 
 
 @dataclass
 class CancelOrderResponse:
-    time: datetime
-    response_metadata: 'ResponseMetadata'
+    time: datetime = message_field(1)
+    response_metadata: 'ResponseMetadata' = message_field(254)
 
 
 @dataclass
 class GetOrderStateRequest:
-    account_id: str
-    order_id: str
-    price_type: 'PriceType'
-    order_id_type: Optional['OrderIdType'] = None
+    account_id: str = message_field(1)
+    order_id: str = message_field(2)
+    price_type: 'PriceType' = message_field(3)
+    order_id_type: Optional['OrderIdType'] = message_field(4, optional=True)
 
 
 @dataclass
 class GetOrdersRequest:
-    account_id: str
-    advanced_filters: Optional['GetOrdersRequestFilters'] = None
+    account_id: str = message_field(1)
+    advanced_filters: Optional['GetOrdersRequestFilters'] = message_field(2,
+        optional=True)
 
 
     @dataclass
     class GetOrdersRequestFilters:
-        execution_status: List['OrderExecutionReportStatus']
-        from_: Optional[datetime] = None
-        to: Optional[datetime] = None
+        from_: Optional[datetime] = message_field(1, optional=True)
+        to: Optional[datetime] = message_field(2, optional=True)
+        execution_status: List['OrderExecutionReportStatus'] = message_field(3)
 
 
 @dataclass
 class GetOrdersResponse:
-    orders: List['OrderState']
+    orders: List['OrderState'] = message_field(1)
 
 
 @dataclass
 class OrderState:
-    order_id: str
-    execution_report_status: 'OrderExecutionReportStatus'
-    lots_requested: int
-    lots_executed: int
-    initial_order_price: 'MoneyValue'
-    executed_order_price: 'MoneyValue'
-    total_order_amount: 'MoneyValue'
-    average_position_price: 'MoneyValue'
-    initial_commission: 'MoneyValue'
-    executed_commission: 'MoneyValue'
-    figi: str
-    direction: 'OrderDirection'
-    initial_security_price: 'MoneyValue'
-    stages: List['OrderStage']
-    service_commission: 'MoneyValue'
-    currency: str
-    order_type: 'OrderType'
-    order_date: datetime
-    instrument_uid: str
-    order_request_id: str
+    order_id: str = message_field(1)
+    execution_report_status: 'OrderExecutionReportStatus' = message_field(2)
+    lots_requested: int = message_field(3)
+    lots_executed: int = message_field(4)
+    initial_order_price: 'MoneyValue' = message_field(5)
+    executed_order_price: 'MoneyValue' = message_field(6)
+    total_order_amount: 'MoneyValue' = message_field(7)
+    average_position_price: 'MoneyValue' = message_field(8)
+    initial_commission: 'MoneyValue' = message_field(9)
+    executed_commission: 'MoneyValue' = message_field(10)
+    figi: str = message_field(11)
+    direction: 'OrderDirection' = message_field(12)
+    initial_security_price: 'MoneyValue' = message_field(13)
+    stages: List['OrderStage'] = message_field(14)
+    service_commission: 'MoneyValue' = message_field(15)
+    currency: str = message_field(16)
+    order_type: 'OrderType' = message_field(17)
+    order_date: datetime = message_field(18)
+    instrument_uid: str = message_field(19)
+    order_request_id: str = message_field(20)
 
 
 @dataclass
 class OrderStage:
-    price: 'MoneyValue'
-    quantity: int
-    trade_id: str
-    execution_time: datetime
+    price: 'MoneyValue' = message_field(1)
+    quantity: int = message_field(2)
+    trade_id: str = message_field(3)
+    execution_time: datetime = message_field(5)
 
 
 @dataclass
 class ReplaceOrderRequest:
-    account_id: str
-    order_id: str
-    idempotency_key: str
-    quantity: int
-    confirm_margin_trade: bool
-    price: Optional['Quotation'] = None
-    price_type: Optional['PriceType'] = None
+    account_id: str = message_field(1)
+    order_id: str = message_field(6)
+    idempotency_key: str = message_field(7)
+    quantity: int = message_field(11)
+    price: Optional['Quotation'] = message_field(12, optional=True)
+    price_type: Optional['PriceType'] = message_field(13, optional=True)
+    confirm_margin_trade: bool = message_field(14)
 
 
 @dataclass
 class GetMaxLotsRequest:
-    account_id: str
-    instrument_id: str
-    price: Optional['Quotation'] = None
+    account_id: str = message_field(1)
+    instrument_id: str = message_field(2)
+    price: Optional['Quotation'] = message_field(3, optional=True)
 
 
 @dataclass
 class GetMaxLotsResponse:
-    currency: str
-    buy_limits: 'BuyLimitsView'
-    buy_margin_limits: 'BuyLimitsView'
-    sell_limits: 'SellLimitsView'
-    sell_margin_limits: 'SellLimitsView'
+    currency: str = message_field(1)
+    buy_limits: 'BuyLimitsView' = message_field(2)
+    buy_margin_limits: 'BuyLimitsView' = message_field(3)
+    sell_limits: 'SellLimitsView' = message_field(4)
+    sell_margin_limits: 'SellLimitsView' = message_field(5)
 
 
     @dataclass
     class BuyLimitsView:
-        buy_money_amount: 'Quotation'
-        buy_max_lots: int
-        buy_max_market_lots: int
+        buy_money_amount: 'Quotation' = message_field(1)
+        buy_max_lots: int = message_field(2)
+        buy_max_market_lots: int = message_field(3)
 
 
     @dataclass
     class SellLimitsView:
-        sell_max_lots: int
+        sell_max_lots: int = message_field(1)
 
 
 @dataclass
 class GetOrderPriceRequest:
-    account_id: str
-    instrument_id: str
-    price: 'Quotation'
-    direction: 'OrderDirection'
-    quantity: int
+    account_id: str = message_field(1)
+    instrument_id: str = message_field(2)
+    price: 'Quotation' = message_field(3)
+    direction: 'OrderDirection' = message_field(12)
+    quantity: int = message_field(13)
 
 
 @dataclass
 class GetOrderPriceResponse:
-    total_order_amount: 'MoneyValue'
-    initial_order_amount: 'MoneyValue'
-    lots_requested: int
-    executed_commission: 'MoneyValue'
-    executed_commission_rub: 'MoneyValue'
-    service_commission: 'MoneyValue'
-    deal_commission: 'MoneyValue'
-    extra_bond: Optional['ExtraBond'] = None
-    extra_future: Optional['ExtraFuture'] = None
+    total_order_amount: 'MoneyValue' = message_field(1)
+    initial_order_amount: 'MoneyValue' = message_field(5)
+    lots_requested: int = message_field(3)
+    executed_commission: 'MoneyValue' = message_field(7)
+    executed_commission_rub: 'MoneyValue' = message_field(8)
+    service_commission: 'MoneyValue' = message_field(9)
+    deal_commission: 'MoneyValue' = message_field(10)
+    extra_bond: Optional['ExtraBond'] = message_field(12, optional=True)
+    extra_future: Optional['ExtraFuture'] = message_field(13, optional=True)
 
 
     @dataclass
     class ExtraBond:
-        aci_value: 'MoneyValue'
-        nominal_conversion_rate: 'Quotation'
+        aci_value: 'MoneyValue' = message_field(2)
+        nominal_conversion_rate: 'Quotation' = message_field(3)
 
 
     @dataclass
     class ExtraFuture:
-        initial_margin: 'MoneyValue'
+        initial_margin: 'MoneyValue' = message_field(2)
 
 
 @dataclass
 class OrderStateStreamRequest:
-    accounts: List[str]
-    ping_delay_millis: Optional[int] = None
+    accounts: List[str] = message_field(1)
+    ping_delay_millis: Optional[int] = message_field(15, optional=True)
 
 
 @dataclass
 class SubscriptionResponse:
-    tracking_id: str
-    status: 'ResultSubscriptionStatus'
-    stream_id: str
-    accounts: List[str]
-    error: Optional['ErrorDetail'] = None
+    tracking_id: str = message_field(1)
+    status: 'ResultSubscriptionStatus' = message_field(2)
+    stream_id: str = message_field(4)
+    accounts: List[str] = message_field(5)
+    error: Optional['ErrorDetail'] = message_field(7, optional=True)
 
 
 @dataclass
 class OrderStateStreamResponse:
-    order_state: Optional['OrderState'] = None
-    ping: Optional['Ping'] = None
-    subscription: Optional['SubscriptionResponse'] = None
+    order_state: Optional['OrderState'] = message_field(1, optional=True)
+    ping: Optional['Ping'] = message_field(2, optional=True)
+    subscription: Optional['SubscriptionResponse'] = message_field(3,
+        optional=True)
 
 
     @dataclass
     class OrderState:
-        order_id: str
-        client_code: str
-        created_at: datetime
-        execution_report_status: 'OrderExecutionReportStatus'
-        ticker: str
-        class_code: str
-        lot_size: int
-        direction: 'OrderDirection'
-        time_in_force: 'TimeInForceType'
-        order_type: 'OrderType'
-        account_id: str
-        initial_order_price: 'MoneyValue'
-        order_price: 'MoneyValue'
-        executed_order_price: 'MoneyValue'
-        currency: str
-        lots_requested: int
-        lots_executed: int
-        lots_left: int
-        lots_cancelled: int
-        trades: List['OrderTrade']
-        completion_time: datetime
-        exchange: str
-        instrument_uid: str
-        order_request_id: Optional[str] = None
-        status_info: Optional['StatusCauseInfo'] = None
-        amount: Optional['MoneyValue'] = None
-        marker: Optional['MarkerType'] = None
+        order_id: str = message_field(1)
+        order_request_id: Optional[str] = message_field(2, optional=True)
+        client_code: str = message_field(3)
+        created_at: datetime = message_field(4)
+        execution_report_status: 'OrderExecutionReportStatus' = message_field(5
+            )
+        status_info: Optional['StatusCauseInfo'] = message_field(6,
+            optional=True)
+        ticker: str = message_field(7)
+        class_code: str = message_field(8)
+        lot_size: int = message_field(9)
+        direction: 'OrderDirection' = message_field(10)
+        time_in_force: 'TimeInForceType' = message_field(11)
+        order_type: 'OrderType' = message_field(12)
+        account_id: str = message_field(13)
+        initial_order_price: 'MoneyValue' = message_field(22)
+        order_price: 'MoneyValue' = message_field(23)
+        amount: Optional['MoneyValue'] = message_field(24, optional=True)
+        executed_order_price: 'MoneyValue' = message_field(25)
+        currency: str = message_field(26)
+        lots_requested: int = message_field(27)
+        lots_executed: int = message_field(28)
+        lots_left: int = message_field(29)
+        lots_cancelled: int = message_field(30)
+        marker: Optional['MarkerType'] = message_field(31, optional=True)
+        trades: List['OrderTrade'] = message_field(33)
+        completion_time: datetime = message_field(35)
+        exchange: str = message_field(36)
+        instrument_uid: str = message_field(41)
 
 
     class MarkerType(IntEnum):

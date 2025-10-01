@@ -3,6 +3,8 @@ from datetime import datetime
 from enum import IntEnum
 from typing import Optional
 
+from tinkoff.invest._grpc_helpers import message_field
+
 
 class InstrumentType(IntEnum):
     INSTRUMENT_TYPE_UNSPECIFIED = 0
@@ -26,15 +28,15 @@ class InstrumentStatus(IntEnum):
 
 @dataclass
 class MoneyValue:
-    currency: str
-    units: int
-    nano: int
+    currency: str = message_field(1)
+    units: int = message_field(2)
+    nano: int = message_field(3)
 
 
 @dataclass
 class Quotation:
-    units: int
-    nano: int
+    units: int = message_field(1)
+    nano: int = message_field(2)
 
 
 class SecurityTradingStatus(IntEnum):
@@ -59,19 +61,19 @@ class SecurityTradingStatus(IntEnum):
 
 @dataclass
 class PingRequest:
-    time: Optional[datetime] = None
+    time: Optional[datetime] = message_field(1, optional=True)
 
 
 @dataclass
 class PingDelaySettings:
-    ping_delay_ms: Optional[int] = None
+    ping_delay_ms: Optional[int] = message_field(15, optional=True)
 
 
 @dataclass
 class Ping:
-    time: datetime
-    stream_id: str
-    ping_request_time: Optional[datetime] = None
+    time: datetime = message_field(1)
+    stream_id: str = message_field(2)
+    ping_request_time: Optional[datetime] = message_field(4, optional=True)
 
 
 class PriceType(IntEnum):
@@ -82,28 +84,28 @@ class PriceType(IntEnum):
 
 @dataclass
 class Page:
-    limit: int
-    page_number: int
+    limit: int = message_field(1)
+    page_number: int = message_field(2)
 
 
 @dataclass
 class PageResponse:
-    limit: int
-    page_number: int
-    total_count: int
+    limit: int = message_field(1)
+    page_number: int = message_field(2)
+    total_count: int = message_field(3)
 
 
 @dataclass
 class ResponseMetadata:
-    tracking_id: str
-    server_time: datetime
+    tracking_id: str = message_field(42)
+    server_time: datetime = message_field(43)
 
 
 @dataclass
 class BrandData:
-    logo_name: str
-    logo_base_color: str
-    text_color: str
+    logo_name: str = message_field(1)
+    logo_base_color: str = message_field(2)
+    text_color: str = message_field(3)
 
 
 class ResultSubscriptionStatus(IntEnum):
@@ -114,8 +116,8 @@ class ResultSubscriptionStatus(IntEnum):
 
 @dataclass
 class ErrorDetail:
-    code: str
-    message: str
+    code: str = message_field(1)
+    message: str = message_field(3)
 
 
 class RealExchange(IntEnum):
