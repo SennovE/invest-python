@@ -1,7 +1,7 @@
 import os
 
 from tinkoff.invest import Client
-from tinkoff.invest.schemas import OrderStateStreamRequest
+from tinkoff.invest.grpc.orders import OrderStateStreamRequest
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

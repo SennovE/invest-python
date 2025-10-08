@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from tinkoff.invest.services import OperationsService
+from tinkoff.invest.grpc.operations import OperationsService
 
 
 @pytest.fixture()

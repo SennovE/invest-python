@@ -3,14 +3,14 @@ import logging
 import os
 from decimal import Decimal
 
-from tinkoff.invest import (
-    Client,
-    InstrumentIdType,
+from tinkoff.invest import Client
+from tinkoff.invest.exceptions import InvestError
+from tinkoff.invest.grpc.instruments import InstrumentIdType
+from tinkoff.invest.grpc.stoporders import (
     StopOrderDirection,
     StopOrderExpirationType,
     StopOrderType,
 )
-from tinkoff.invest.exceptions import InvestError
 from tinkoff.invest.utils import decimal_to_quotation, quotation_to_decimal
 
 TOKEN = os.environ["INVEST_TOKEN"]

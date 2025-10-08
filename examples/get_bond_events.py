@@ -1,7 +1,8 @@
 import os
 
 from tinkoff.invest import Client
-from tinkoff.invest.schemas import EventType, GetBondEventsRequest, InstrumentType
+from tinkoff.invest.grpc.common import InstrumentType
+from tinkoff.invest.grpc.instruments import GetBondEventsRequest
 
 TOKEN = os.environ["INVEST_TOKEN"]
 
@@ -15,7 +16,7 @@ def main():
 
         request = GetBondEventsRequest(
             instrument_id=bond.uid,
-            type=EventType.EVENT_TYPE_CALL,
+            type=GetBondEventsRequest.EventType.EVENT_TYPE_CALL,
         )
         print(client.instruments.get_bond_events(request=request))
 

@@ -1,8 +1,8 @@
 import os
 
-from tinkoff.invest import (
+from tinkoff.invest import Client
+from tinkoff.invest.grpc.marketdata import (
     CandleInstrument,
-    Client,
     InfoInstrument,
     SubscriptionInterval,
 )

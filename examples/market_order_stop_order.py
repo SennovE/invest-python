@@ -19,12 +19,14 @@ import uuid
 from datetime import timedelta
 from decimal import Decimal
 
-from tinkoff.invest import (
-    Client,
+from tinkoff.invest import Client
+from tinkoff.invest.grpc.orders import (
     OrderDirection,
     OrderExecutionReportStatus,
     OrderType,
     PostOrderResponse,
+)
+from tinkoff.invest.grpc.stoporders import (
     StopOrderDirection,
     StopOrderExpirationType,
     StopOrderType,

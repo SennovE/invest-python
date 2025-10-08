@@ -1,7 +1,8 @@
 import asyncio
 import os
 
-from tinkoff.invest import AsyncClient, InstrumentStatus
+from tinkoff.invest import AsyncClient
+from tinkoff.invest.grpc.instruments import InstrumentStatus
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

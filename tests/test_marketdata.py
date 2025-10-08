@@ -7,14 +7,14 @@ from google.protobuf.json_format import MessageToDict
 
 from tinkoff.invest._grpc_helpers import dataclass_to_protobuff
 from tinkoff.invest.grpc import marketdata_pb2
-from tinkoff.invest.schemas import (
+from tinkoff.invest.grpc.marketdata import (
     GetMySubscriptions,
     MarketDataRequest,
+    MarketDataService,
     SubscribeTradesRequest,
     SubscriptionAction,
     TradeInstrument,
 )
-from tinkoff.invest.services import MarketDataService
 
 
 @pytest.fixture()

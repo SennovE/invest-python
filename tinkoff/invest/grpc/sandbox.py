@@ -4,6 +4,7 @@ from typing import Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import handle_request_error
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import sandbox_pb2, sandbox_pb2_grpc
 from tinkoff.invest.grpc.common import MoneyValue
@@ -44,6 +45,7 @@ class SandboxService(BaseService):
     _protobuf_grpc = sandbox_pb2_grpc
     _protobuf_stub = _protobuf_grpc.SandboxServiceStub
 
+    @handle_request_error('OpenSandboxAccount')
     def open_sandbox_account(self, request: 'OpenSandboxAccountRequest'
         ) ->'OpenSandboxAccountResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -53,6 +55,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'OpenSandboxAccount')
         return protobuf_to_dataclass(response, OpenSandboxAccountResponse)
 
+    @handle_request_error('GetSandboxAccounts')
     def get_sandbox_accounts(self, request: 'GetAccountsRequest'
         ) ->'GetAccountsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -62,6 +65,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetSandboxAccounts')
         return protobuf_to_dataclass(response, GetAccountsResponse)
 
+    @handle_request_error('CloseSandboxAccount')
     def close_sandbox_account(self, request: 'CloseSandboxAccountRequest'
         ) ->'CloseSandboxAccountResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -71,6 +75,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'CloseSandboxAccount')
         return protobuf_to_dataclass(response, CloseSandboxAccountResponse)
 
+    @handle_request_error('PostSandboxOrder')
     def post_sandbox_order(self, request: 'PostOrderRequest'
         ) ->'PostOrderResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -80,6 +85,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'PostSandboxOrder')
         return protobuf_to_dataclass(response, PostOrderResponse)
 
+    @handle_request_error('PostSandboxOrderAsync')
     def post_sandbox_order_async(self, request: 'PostOrderAsyncRequest'
         ) ->'PostOrderAsyncResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -89,6 +95,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'PostSandboxOrderAsync')
         return protobuf_to_dataclass(response, PostOrderAsyncResponse)
 
+    @handle_request_error('ReplaceSandboxOrder')
     def replace_sandbox_order(self, request: 'ReplaceOrderRequest'
         ) ->'PostOrderResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -98,6 +105,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'ReplaceSandboxOrder')
         return protobuf_to_dataclass(response, PostOrderResponse)
 
+    @handle_request_error('GetSandboxOrders')
     def get_sandbox_orders(self, request: 'GetOrdersRequest'
         ) ->'GetOrdersResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -107,6 +115,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetSandboxOrders')
         return protobuf_to_dataclass(response, GetOrdersResponse)
 
+    @handle_request_error('CancelSandboxOrder')
     def cancel_sandbox_order(self, request: 'CancelOrderRequest'
         ) ->'CancelOrderResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -116,6 +125,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'CancelSandboxOrder')
         return protobuf_to_dataclass(response, CancelOrderResponse)
 
+    @handle_request_error('GetSandboxOrderState')
     def get_sandbox_order_state(self, request: 'GetOrderStateRequest'
         ) ->'OrderState':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -125,6 +135,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetSandboxOrderState')
         return protobuf_to_dataclass(response, OrderState)
 
+    @handle_request_error('GetSandboxPositions')
     def get_sandbox_positions(self, request: 'PositionsRequest'
         ) ->'PositionsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -134,6 +145,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetSandboxPositions')
         return protobuf_to_dataclass(response, PositionsResponse)
 
+    @handle_request_error('GetSandboxOperations')
     def get_sandbox_operations(self, request: 'OperationsRequest'
         ) ->'OperationsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -143,6 +155,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetSandboxOperations')
         return protobuf_to_dataclass(response, OperationsResponse)
 
+    @handle_request_error('GetSandboxOperationsByCursor')
     def get_sandbox_operations_by_cursor(self, request:
         'GetOperationsByCursorRequest') ->'GetOperationsByCursorResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -153,6 +166,7 @@ class SandboxService(BaseService):
             'GetSandboxOperationsByCursor')
         return protobuf_to_dataclass(response, GetOperationsByCursorResponse)
 
+    @handle_request_error('GetSandboxPortfolio')
     def get_sandbox_portfolio(self, request: 'PortfolioRequest'
         ) ->'PortfolioResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -162,6 +176,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetSandboxPortfolio')
         return protobuf_to_dataclass(response, PortfolioResponse)
 
+    @handle_request_error('SandboxPayIn')
     def sandbox_pay_in(self, request: 'SandboxPayInRequest'
         ) ->'SandboxPayInResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -171,6 +186,7 @@ class SandboxService(BaseService):
         log_request(get_tracking_id_from_call(call), 'SandboxPayIn')
         return protobuf_to_dataclass(response, SandboxPayInResponse)
 
+    @handle_request_error('GetSandboxWithdrawLimits')
     def get_sandbox_withdraw_limits(self, request: 'WithdrawLimitsRequest'
         ) ->'WithdrawLimitsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -181,6 +197,7 @@ class SandboxService(BaseService):
             )
         return protobuf_to_dataclass(response, WithdrawLimitsResponse)
 
+    @handle_request_error('GetSandboxMaxLots')
     def get_sandbox_max_lots(self, request: 'GetMaxLotsRequest'
         ) ->'GetMaxLotsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.

@@ -8,21 +8,18 @@ from typing import Callable, Dict, Iterable, Iterator, List, Optional
 import pytest
 from grpc import StatusCode
 
-from tinkoff.invest import (
+from tinkoff.invest import Client
+from tinkoff.invest.exceptions import RequestError
+from tinkoff.invest.grpc.common import MoneyValue, Quotation
+from tinkoff.invest.grpc.marketdata import (
     Candle,
-    Client,
     GetCandlesResponse,
-    GetMarginAttributesResponse,
     HistoricCandle,
     MarketDataResponse,
-    MoneyValue,
-    OrderDirection,
-    OrderType,
-    PortfolioPosition,
-    PortfolioResponse,
-    Quotation,
-    RequestError,
 )
+from tinkoff.invest.grpc.operations import PortfolioPosition, PortfolioResponse
+from tinkoff.invest.grpc.orders import OrderDirection, OrderType
+from tinkoff.invest.grpc.users import GetMarginAttributesResponse
 from tinkoff.invest.services import Services
 from tinkoff.invest.strategies.base.account_manager import AccountManager
 from tinkoff.invest.strategies.moving_average.plotter import (

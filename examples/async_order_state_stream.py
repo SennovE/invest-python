@@ -2,7 +2,7 @@ import asyncio
 import os
 
 from tinkoff.invest import AsyncClient
-from tinkoff.invest.schemas import OrderStateStreamRequest
+from tinkoff.invest.grpc.orders import OrderStateStreamRequest
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

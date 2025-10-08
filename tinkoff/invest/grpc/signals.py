@@ -6,6 +6,7 @@ from typing import List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import handle_request_error
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import signals_pb2, signals_pb2_grpc
 from tinkoff.invest.grpc.common import Page, PageResponse, Quotation
@@ -18,6 +19,7 @@ class SignalService(BaseService):
     _protobuf_grpc = signals_pb2_grpc
     _protobuf_stub = _protobuf_grpc.SignalServiceStub
 
+    @handle_request_error('GetStrategies')
     def get_strategies(self, request: 'GetStrategiesRequest'
         ) ->'GetStrategiesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -27,6 +29,7 @@ class SignalService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetStrategies')
         return protobuf_to_dataclass(response, GetStrategiesResponse)
 
+    @handle_request_error('GetSignals')
     def get_signals(self, request: 'GetSignalsRequest') ->'GetSignalsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             GetSignalsRequest())

@@ -1,14 +1,7 @@
 import os
-from datetime import timedelta
 
 from tinkoff.invest import Client
-from tinkoff.invest.schemas import (
-    GetAssetReportsRequest,
-    GetConsensusForecastsRequest,
-    InstrumentIdType,
-    Page,
-)
-from tinkoff.invest.utils import now
+from tinkoff.invest.grpc.instruments import GetConsensusForecastsRequest, Page
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

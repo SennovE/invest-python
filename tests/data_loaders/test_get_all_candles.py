@@ -5,13 +5,14 @@ from datetime import timedelta
 
 import pytest
 
-from tinkoff.invest.schemas import (
+from tinkoff.invest.grpc.marketdata import (
     CandleInterval,
     GetCandlesResponse,
     HistoricCandle,
+    MarketDataService,
     Quotation,
 )
-from tinkoff.invest.services import MarketDataService, Services
+from tinkoff.invest.grpc.utils.grpc_services import Services
 from tinkoff.invest.utils import now
 
 

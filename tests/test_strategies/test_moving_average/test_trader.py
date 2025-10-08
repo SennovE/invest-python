@@ -6,13 +6,9 @@ from typing import Dict
 import matplotlib.pyplot as plt
 import pytest
 
-from tinkoff.invest import (
-    CandleInterval,
-    MoneyValue,
-    PortfolioPosition,
-    PortfolioResponse,
-    Quotation,
-)
+from tinkoff.invest.grpc.common import MoneyValue
+from tinkoff.invest.grpc.marketdata import CandleInterval, Quotation
+from tinkoff.invest.grpc.operations import PortfolioPosition, PortfolioResponse
 from tinkoff.invest.strategies.base.account_manager import AccountManager
 from tinkoff.invest.strategies.moving_average.plotter import (
     MovingAverageStrategyPlotter,

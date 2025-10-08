@@ -3,8 +3,8 @@
 import os
 from uuid import uuid4
 
-from tinkoff.invest import Client, OrderDirection, OrderType
-from tinkoff.invest.schemas import PostOrderAsyncRequest
+from tinkoff.invest import Client
+from tinkoff.invest.grpc.orders import OrderDirection, OrderType, PostOrderAsyncRequest
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

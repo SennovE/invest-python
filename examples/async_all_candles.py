@@ -2,8 +2,8 @@ import asyncio
 import os
 from datetime import timedelta
 
-from tinkoff.invest import AsyncClient, CandleInterval
-from tinkoff.invest.schemas import CandleSource
+from tinkoff.invest import AsyncClient
+from tinkoff.invest.grpc.marketdata import CandleInterval, CandleSource
 from tinkoff.invest.utils import now
 
 TOKEN = os.environ["INVEST_TOKEN"]

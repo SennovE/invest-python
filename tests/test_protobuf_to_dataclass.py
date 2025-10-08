@@ -3,11 +3,11 @@ import os
 
 import pytest
 
-from tinkoff.invest import (
+from tinkoff.invest._grpc_helpers import protobuf_to_dataclass
+from tinkoff.invest.grpc.instruments import (
     EditFavoritesActionType,
     EditFavoritesRequest as DataclassModel,
 )
-from tinkoff.invest._grpc_helpers import protobuf_to_dataclass
 from tinkoff.invest.grpc.instruments_pb2 import EditFavoritesRequest as ProtoModel
 
 logging.basicConfig(level=logging.DEBUG)

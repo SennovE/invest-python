@@ -3,7 +3,7 @@ import os
 from datetime import timedelta
 
 from tinkoff.invest import AsyncClient
-from tinkoff.invest.schemas import GetAssetReportsRequest
+from tinkoff.invest.grpc.instruments import GetAssetReportsRequest
 from tinkoff.invest.utils import now
 
 TOKEN = os.environ["INVEST_TOKEN"]

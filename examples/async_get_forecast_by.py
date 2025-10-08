@@ -2,7 +2,7 @@ import asyncio
 import os
 
 from tinkoff.invest import AsyncClient
-from tinkoff.invest.schemas import GetForecastRequest
+from tinkoff.invest.grpc.instruments import GetForecastRequest
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

@@ -1,7 +1,7 @@
 import os
 
 from tinkoff.invest import Client
-from tinkoff.invest.schemas import GetMarketValuesRequest, MarketValueType
+from tinkoff.invest.grpc.marketdata import GetMarketValuesRequest, MarketValueType
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

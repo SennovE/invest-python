@@ -1,7 +1,7 @@
 import os
 
 from tinkoff.invest import Client
-from tinkoff.invest.schemas import TradeSourceType
+from tinkoff.invest.grpc.marketdata import TradeSourceType
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

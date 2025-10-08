@@ -3,7 +3,7 @@ from random import randrange
 
 import pytest
 
-from tinkoff.invest import Quotation
+from tinkoff.invest.grpc.utils.grpc_services import Quotation
 from tinkoff.invest.utils import decimal_to_quotation, quotation_to_decimal
 
 MAX_UNITS = 999_999_999_999

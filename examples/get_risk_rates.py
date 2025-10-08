@@ -1,7 +1,7 @@
 import os
 
 from tinkoff.invest import Client
-from tinkoff.invest.schemas import RiskRatesRequest
+from tinkoff.invest.grpc.instruments import RiskRatesRequest
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

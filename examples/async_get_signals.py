@@ -4,7 +4,7 @@ import datetime
 import os
 
 from tinkoff.invest import AsyncClient
-from tinkoff.invest.schemas import GetSignalsRequest, SignalState
+from tinkoff.invest.grpc.signals import GetSignalsRequest, SignalState
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

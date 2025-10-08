@@ -8,19 +8,16 @@ import logging
 import os
 from decimal import Decimal
 
-from tinkoff.invest import (
-    Client,
+from tinkoff.invest import Client
+from tinkoff.invest.grpc.stoporders import (
     ExchangeOrderType,
-    GetStopOrdersRequest,
     PostStopOrderRequest,
-    PostStopOrderRequestTrailingData,
     StopOrderDirection,
     StopOrderExpirationType,
-    StopOrderTrailingData,
     StopOrderType,
     TakeProfitType,
+    TrailingValueType,
 )
-from tinkoff.invest.schemas import TrailingValueType
 from tinkoff.invest.utils import decimal_to_quotation
 
 TOKEN = os.environ["INVEST_TOKEN"]
@@ -63,7 +60,7 @@ def main():
             expiration_type=StopOrderExpirationType.STOP_ORDER_EXPIRATION_TYPE_GOOD_TILL_CANCEL,
             exchange_order_type=ExchangeOrderType.EXCHANGE_ORDER_TYPE_LIMIT,
             take_profit_type=TakeProfitType.TAKE_PROFIT_TYPE_TRAILING,
-            trailing_data=StopOrderTrailingData(
+            trailing_data=PostStopOrderRequest.TrailingData(
                 indent=decimal_to_quotation(Decimal(INDENT)),
                 indent_type=TrailingValueType.TRAILING_VALUE_ABSOLUTE,
                 spread=decimal_to_quotation(Decimal(SPREAD)),

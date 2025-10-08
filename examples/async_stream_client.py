@@ -1,8 +1,8 @@
 import asyncio
 import os
 
-from tinkoff.invest import (
-    AsyncClient,
+from tinkoff.invest import AsyncClient
+from tinkoff.invest.grpc.marketdata import (
     CandleInstrument,
     MarketDataRequest,
     SubscribeCandlesRequest,

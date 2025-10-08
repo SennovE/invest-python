@@ -1,9 +1,8 @@
 import asyncio
 import os
 
-from tinkoff.invest import GetMaxLotsRequest
+from tinkoff.invest.grpc.sandbox import GetMaxLotsRequest
 from tinkoff.invest.sandbox.async_client import AsyncSandboxClient
-from tinkoff.invest.sandbox.client import SandboxClient
 
 TOKEN = os.environ["INVEST_SANDBOX_TOKEN"]
 

@@ -6,6 +6,7 @@ from typing import List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import handle_request_error
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import users_pb2, users_pb2_grpc
 from tinkoff.invest.grpc.common import MoneyValue, Quotation
@@ -19,6 +20,7 @@ class UsersService(BaseService):
     _protobuf_grpc = users_pb2_grpc
     _protobuf_stub = _protobuf_grpc.UsersServiceStub
 
+    @handle_request_error('GetAccounts')
     def get_accounts(self, request: 'GetAccountsRequest'
         ) ->'GetAccountsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -28,6 +30,7 @@ class UsersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetAccounts')
         return protobuf_to_dataclass(response, GetAccountsResponse)
 
+    @handle_request_error('GetMarginAttributes')
     def get_margin_attributes(self, request: 'GetMarginAttributesRequest'
         ) ->'GetMarginAttributesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -37,6 +40,7 @@ class UsersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetMarginAttributes')
         return protobuf_to_dataclass(response, GetMarginAttributesResponse)
 
+    @handle_request_error('GetUserTariff')
     def get_user_tariff(self, request: 'GetUserTariffRequest'
         ) ->'GetUserTariffResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -46,6 +50,7 @@ class UsersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetUserTariff')
         return protobuf_to_dataclass(response, GetUserTariffResponse)
 
+    @handle_request_error('GetInfo')
     def get_info(self, request: 'GetInfoRequest') ->'GetInfoResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             GetInfoRequest())

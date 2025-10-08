@@ -8,11 +8,11 @@ from typing import Dict, Iterable
 
 import pytest
 
-from tinkoff.invest import CandleInterval
 from tinkoff.invest.caching.market_data_cache.cache import MarketDataCache
 from tinkoff.invest.caching.market_data_cache.cache_settings import (
     MarketDataCacheSettings,
 )
+from tinkoff.invest.grpc.marketdata import CandleInterval
 from tinkoff.invest.sandbox.client import SandboxClient
 from tinkoff.invest.utils import now
 

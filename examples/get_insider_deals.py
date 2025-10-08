@@ -5,7 +5,7 @@ import logging
 import os
 
 from tinkoff.invest import Client
-from tinkoff.invest.schemas import GetInsiderDealsRequest
+from tinkoff.invest.grpc.instruments import GetInsiderDealsRequest
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

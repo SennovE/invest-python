@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import pytest
 
-from tinkoff.invest import CandleInterval
+from tinkoff.invest.grpc.marketdata import CandleInterval
 from tinkoff.invest.utils import (
     candle_interval_to_timedelta,
     ceil_datetime,

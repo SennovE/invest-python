@@ -7,13 +7,6 @@ from typing import List, Optional, Tuple
 
 import pytest
 
-from tinkoff.invest import (
-    CandleInterval,
-    Client,
-    GetCandlesResponse,
-    HistoricCandle,
-    Quotation,
-)
 from tinkoff.invest.caching.market_data_cache.cache import MarketDataCache
 from tinkoff.invest.caching.market_data_cache.cache_settings import (
     FileMetaData,
@@ -23,8 +16,15 @@ from tinkoff.invest.caching.market_data_cache.cache_settings import (
 from tinkoff.invest.caching.market_data_cache.instrument_market_data_storage import (
     InstrumentMarketDataStorage,
 )
-from tinkoff.invest.schemas import CandleSource
-from tinkoff.invest.services import MarketDataService
+from tinkoff.invest.grpc.marketdata import (
+    CandleInterval,
+    CandleSource,
+    GetCandlesResponse,
+    HistoricCandle,
+    MarketDataService,
+    Quotation,
+)
+from tinkoff.invest.grpc.utils.clients import Client
 from tinkoff.invest.utils import (
     candle_interval_to_timedelta,
     ceil_datetime,

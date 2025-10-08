@@ -6,6 +6,7 @@ from typing import Iterable, List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import handle_request_error, handle_request_error_gen
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import operations_pb2, operations_pb2_grpc
 from tinkoff.invest.grpc.common import (
@@ -26,6 +27,7 @@ class OperationsService(BaseService):
     _protobuf_grpc = operations_pb2_grpc
     _protobuf_stub = _protobuf_grpc.OperationsServiceStub
 
+    @handle_request_error('GetOperations')
     def get_operations(self, request: 'OperationsRequest'
         ) ->'OperationsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -35,6 +37,7 @@ class OperationsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetOperations')
         return protobuf_to_dataclass(response, OperationsResponse)
 
+    @handle_request_error('GetPortfolio')
     def get_portfolio(self, request: 'PortfolioRequest') ->'PortfolioResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             PortfolioRequest())
@@ -43,6 +46,7 @@ class OperationsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetPortfolio')
         return protobuf_to_dataclass(response, PortfolioResponse)
 
+    @handle_request_error('GetPositions')
     def get_positions(self, request: 'PositionsRequest') ->'PositionsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             PositionsRequest())
@@ -51,6 +55,7 @@ class OperationsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetPositions')
         return protobuf_to_dataclass(response, PositionsResponse)
 
+    @handle_request_error('GetWithdrawLimits')
     def get_withdraw_limits(self, request: 'WithdrawLimitsRequest'
         ) ->'WithdrawLimitsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -60,6 +65,7 @@ class OperationsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetWithdrawLimits')
         return protobuf_to_dataclass(response, WithdrawLimitsResponse)
 
+    @handle_request_error('GetBrokerReport')
     def get_broker_report(self, request: 'BrokerReportRequest'
         ) ->'BrokerReportResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -69,6 +75,7 @@ class OperationsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetBrokerReport')
         return protobuf_to_dataclass(response, BrokerReportResponse)
 
+    @handle_request_error('GetDividendsForeignIssuer')
     def get_dividends_foreign_issuer(self, request:
         'GetDividendsForeignIssuerRequest'
         ) ->'GetDividendsForeignIssuerResponse':
@@ -81,6 +88,7 @@ class OperationsService(BaseService):
         return protobuf_to_dataclass(response,
             GetDividendsForeignIssuerResponse)
 
+    @handle_request_error('GetOperationsByCursor')
     def get_operations_by_cursor(self, request: 'GetOperationsByCursorRequest'
         ) ->'GetOperationsByCursorResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -97,6 +105,7 @@ class OperationsStreamService(BaseService):
     _protobuf_grpc = operations_pb2_grpc
     _protobuf_stub = _protobuf_grpc.OperationsStreamServiceStub
 
+    @handle_request_error('PortfolioStream')
     def portfolio_stream(self, request: 'PortfolioStreamRequest') ->Iterable[
         'PortfolioStreamResponse']:
         for response in self._stub.PortfolioStream(request=
@@ -104,6 +113,7 @@ class OperationsStreamService(BaseService):
             PortfolioStreamRequest()), metadata=self._metadata):
             yield protobuf_to_dataclass(response, PortfolioStreamResponse)
 
+    @handle_request_error('PositionsStream')
     def positions_stream(self, request: 'PositionsStreamRequest') ->Iterable[
         'PositionsStreamResponse']:
         for response in self._stub.PositionsStream(request=

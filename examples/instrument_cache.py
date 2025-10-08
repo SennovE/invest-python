@@ -2,9 +2,10 @@ import logging
 import os
 from pprint import pprint
 
-from tinkoff.invest import Client, InstrumentIdType
+from tinkoff.invest import Client
 from tinkoff.invest.caching.instruments_cache.instruments_cache import InstrumentsCache
 from tinkoff.invest.caching.instruments_cache.settings import InstrumentsCacheSettings
+from tinkoff.invest.grpc.instruments import InstrumentIdType
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

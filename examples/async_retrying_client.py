@@ -3,7 +3,7 @@ import logging
 import os
 from datetime import timedelta
 
-from tinkoff.invest import CandleInterval
+from tinkoff.invest.grpc.marketdata import CandleInterval
 from tinkoff.invest.retrying.aio.client import AsyncRetryingClient
 from tinkoff.invest.retrying.settings import RetryClientSettings
 from tinkoff.invest.utils import now

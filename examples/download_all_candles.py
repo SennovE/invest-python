@@ -3,11 +3,12 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-from tinkoff.invest import CandleInterval, Client
+from tinkoff.invest import Client
 from tinkoff.invest.caching.market_data_cache.cache import MarketDataCache
 from tinkoff.invest.caching.market_data_cache.cache_settings import (
     MarketDataCacheSettings,
 )
+from tinkoff.invest.grpc.marketdata import CandleInterval
 from tinkoff.invest.utils import now
 
 TOKEN = os.environ["INVEST_TOKEN"]

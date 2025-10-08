@@ -7,11 +7,14 @@ from unittest.mock import Mock
 import pytest
 from pytest_freezegun import freeze_time
 
-from tinkoff.invest import (
+from tinkoff.invest import Client
+from tinkoff.invest.caching.instruments_cache.instruments_cache import InstrumentsCache
+from tinkoff.invest.caching.instruments_cache.models import InstrumentsResponse
+from tinkoff.invest.caching.instruments_cache.settings import InstrumentsCacheSettings
+from tinkoff.invest.grpc.instruments import (
     Bond,
     BondResponse,
     BondsResponse,
-    Client,
     CurrenciesResponse,
     Currency,
     CurrencyResponse,
@@ -26,9 +29,6 @@ from tinkoff.invest import (
     ShareResponse,
     SharesResponse,
 )
-from tinkoff.invest.caching.instruments_cache.instruments_cache import InstrumentsCache
-from tinkoff.invest.caching.instruments_cache.models import InstrumentsResponse
-from tinkoff.invest.caching.instruments_cache.settings import InstrumentsCacheSettings
 from tinkoff.invest.services import Services
 
 

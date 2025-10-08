@@ -3,7 +3,7 @@ from typing import Tuple
 
 import pytest
 
-from tinkoff.invest import CandleInterval
+from tinkoff.invest.grpc.marketdata import CandleInterval
 from tinkoff.invest.utils import round_datetime_range
 
 

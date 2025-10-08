@@ -1,7 +1,7 @@
 import os
 
 from tinkoff.invest import Client
-from tinkoff.invest.schemas import IndicativesRequest
+from tinkoff.invest.grpc.instruments import IndicativesRequest
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

@@ -7,16 +7,12 @@ from datetime import datetime
 import pytest
 
 from tests.utils import skip_when
-from tinkoff.invest import (
-    Account,
-    CloseSandboxAccountResponse,
-    MoneyValue,
-    OperationState,
-    OrderDirection,
-    OrderType,
-    Quotation,
-    RequestError,
-)
+from tinkoff.invest.exceptions import RequestError
+from tinkoff.invest.grpc.common import MoneyValue, Quotation
+from tinkoff.invest.grpc.operations import OperationState
+from tinkoff.invest.grpc.orders import OrderDirection, OrderType
+from tinkoff.invest.grpc.sandbox import CloseSandboxAccountResponse
+from tinkoff.invest.grpc.users import Account
 from tinkoff.invest.sandbox.client import SandboxClient
 from tinkoff.invest.schemas import OrderExecutionReportStatus, PostOrderAsyncRequest
 from tinkoff.invest.utils import money_to_decimal

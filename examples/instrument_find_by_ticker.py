@@ -1,6 +1,7 @@
 import os
 
-from tinkoff.invest import Client, InstrumentIdType
+from tinkoff.invest import Client
+from tinkoff.invest.grpc.instruments import InstrumentIdType
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

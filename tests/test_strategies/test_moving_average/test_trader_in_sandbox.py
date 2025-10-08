@@ -7,19 +7,18 @@ from typing import Iterator
 import matplotlib.pyplot as plt
 import pytest
 
-from tinkoff.invest import (
-    CandleInterval,
-    Client,
-    GetMarginAttributesResponse,
+from tinkoff.invest import Client
+from tinkoff.invest.exceptions import UnauthenticatedError
+from tinkoff.invest.grpc.common import MoneyValue, Quotation
+from tinkoff.invest.grpc.instruments import (
     InstrumentIdType,
-    MoneyValue,
-    OpenSandboxAccountResponse,
-    Quotation,
     ShareResponse,
     TradingSchedulesResponse,
 )
-from tinkoff.invest.exceptions import UnauthenticatedError
-from tinkoff.invest.services import SandboxService, Services
+from tinkoff.invest.grpc.marketdata import CandleInterval
+from tinkoff.invest.grpc.sandbox import OpenSandboxAccountResponse, SandboxService
+from tinkoff.invest.grpc.users import GetMarginAttributesResponse
+from tinkoff.invest.services import Services
 from tinkoff.invest.strategies.base.account_manager import AccountManager
 from tinkoff.invest.strategies.base.errors import MarketDataNotAvailableError
 from tinkoff.invest.strategies.moving_average.plotter import (

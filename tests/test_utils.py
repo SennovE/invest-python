@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pytest
 
-from tinkoff.invest.schemas import CandleInterval
+from tinkoff.invest.grpc.marketdata import CandleInterval
 from tinkoff.invest.utils import empty_or_uuid, get_intervals
 
 

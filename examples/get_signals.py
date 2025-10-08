@@ -3,7 +3,7 @@
 import os
 
 from tinkoff.invest import Client
-from tinkoff.invest.schemas import GetSignalsRequest, SignalState
+from tinkoff.invest.grpc.signals import GetSignalsRequest, SignalState
 
 TOKEN = os.environ["INVEST_TOKEN"]
 

@@ -4,7 +4,8 @@ import logging
 import os
 from decimal import Decimal
 
-from tinkoff.invest import Client, GetOrderPriceRequest, OrderDirection
+from tinkoff.invest import Client
+from tinkoff.invest.grpc.orders import GetOrderPriceRequest, OrderDirection
 from tinkoff.invest.utils import decimal_to_quotation
 
 TOKEN = os.environ["INVEST_TOKEN"]

@@ -1,7 +1,7 @@
 import os
 
 from tinkoff.invest import Client
-from tinkoff.invest.schemas import (
+from tinkoff.invest.grpc.instruments import (
     CreateFavoriteGroupRequest,
     DeleteFavoriteGroupRequest,
     EditFavoritesActionType as At,
