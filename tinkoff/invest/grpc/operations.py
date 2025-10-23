@@ -1,11 +1,17 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
-from typing import Iterable, List, Optional
+from typing import AsyncIterable, Iterable, List, Optional
 
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import (
+    handle_aio_request_error,
+    handle_aio_request_error_gen,
+    handle_request_error,
+    handle_request_error_gen,
+)
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import operations_pb2, operations_pb2_grpc
 from tinkoff.invest.grpc.common import (
@@ -15,7 +21,11 @@ from tinkoff.invest.grpc.common import (
     PingDelaySettings,
     Quotation,
 )
-from tinkoff.invest.logging import get_tracking_id_from_call, log_request
+from tinkoff.invest.logging import (
+    get_tracking_id_from_call,
+    get_tracking_id_from_coro,
+    log_request,
+)
 
 
 class OperationsService(BaseService):
@@ -26,6 +36,7 @@ class OperationsService(BaseService):
     _protobuf_grpc = operations_pb2_grpc
     _protobuf_stub = _protobuf_grpc.OperationsServiceStub
 
+    @handle_request_error('GetOperations')
     def get_operations(self, request: 'OperationsRequest'
         ) ->'OperationsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -35,6 +46,7 @@ class OperationsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetOperations')
         return protobuf_to_dataclass(response, OperationsResponse)
 
+    @handle_request_error('GetPortfolio')
     def get_portfolio(self, request: 'PortfolioRequest') ->'PortfolioResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             PortfolioRequest())
@@ -43,6 +55,7 @@ class OperationsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetPortfolio')
         return protobuf_to_dataclass(response, PortfolioResponse)
 
+    @handle_request_error('GetPositions')
     def get_positions(self, request: 'PositionsRequest') ->'PositionsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             PositionsRequest())
@@ -51,6 +64,7 @@ class OperationsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetPositions')
         return protobuf_to_dataclass(response, PositionsResponse)
 
+    @handle_request_error('GetWithdrawLimits')
     def get_withdraw_limits(self, request: 'WithdrawLimitsRequest'
         ) ->'WithdrawLimitsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -60,6 +74,7 @@ class OperationsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetWithdrawLimits')
         return protobuf_to_dataclass(response, WithdrawLimitsResponse)
 
+    @handle_request_error('GetBrokerReport')
     def get_broker_report(self, request: 'BrokerReportRequest'
         ) ->'BrokerReportResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -69,6 +84,7 @@ class OperationsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetBrokerReport')
         return protobuf_to_dataclass(response, BrokerReportResponse)
 
+    @handle_request_error('GetDividendsForeignIssuer')
     def get_dividends_foreign_issuer(self, request:
         'GetDividendsForeignIssuerRequest'
         ) ->'GetDividendsForeignIssuerResponse':
@@ -81,6 +97,7 @@ class OperationsService(BaseService):
         return protobuf_to_dataclass(response,
             GetDividendsForeignIssuerResponse)
 
+    @handle_request_error('GetOperationsByCursor')
     def get_operations_by_cursor(self, request: 'GetOperationsByCursorRequest'
         ) ->'GetOperationsByCursorResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -91,12 +108,106 @@ class OperationsService(BaseService):
         return protobuf_to_dataclass(response, GetOperationsByCursorResponse)
 
 
+class AsyncOperationsService(BaseService):
+    """//GetOperations — список операций по счету"""
+    _protobuf = operations_pb2
+    _protobuf_grpc = operations_pb2_grpc
+    _protobuf_stub = _protobuf_grpc.OperationsServiceStub
+
+    @handle_aio_request_error('GetOperations')
+    async def get_operations(self, request: 'OperationsRequest'
+        ) ->'OperationsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            OperationsRequest())
+        response_coro = self._stub.GetOperations(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetOperations')
+        return protobuf_to_dataclass(response, OperationsResponse)
+
+    @handle_aio_request_error('GetPortfolio')
+    async def get_portfolio(self, request: 'PortfolioRequest'
+        ) ->'PortfolioResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            PortfolioRequest())
+        response_coro = self._stub.GetPortfolio(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetPortfolio')
+        return protobuf_to_dataclass(response, PortfolioResponse)
+
+    @handle_aio_request_error('GetPositions')
+    async def get_positions(self, request: 'PositionsRequest'
+        ) ->'PositionsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            PositionsRequest())
+        response_coro = self._stub.GetPositions(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetPositions')
+        return protobuf_to_dataclass(response, PositionsResponse)
+
+    @handle_aio_request_error('GetWithdrawLimits')
+    async def get_withdraw_limits(self, request: 'WithdrawLimitsRequest'
+        ) ->'WithdrawLimitsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            WithdrawLimitsRequest())
+        response_coro = self._stub.GetWithdrawLimits(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetWithdrawLimits')
+        return protobuf_to_dataclass(response, WithdrawLimitsResponse)
+
+    @handle_aio_request_error('GetBrokerReport')
+    async def get_broker_report(self, request: 'BrokerReportRequest'
+        ) ->'BrokerReportResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            BrokerReportRequest())
+        response_coro = self._stub.GetBrokerReport(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetBrokerReport')
+        return protobuf_to_dataclass(response, BrokerReportResponse)
+
+    @handle_aio_request_error('GetDividendsForeignIssuer')
+    async def get_dividends_foreign_issuer(self, request:
+        'GetDividendsForeignIssuerRequest'
+        ) ->'GetDividendsForeignIssuerResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetDividendsForeignIssuerRequest())
+        response_coro = self._stub.GetDividendsForeignIssuer(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetDividendsForeignIssuer')
+        return protobuf_to_dataclass(response,
+            GetDividendsForeignIssuerResponse)
+
+    @handle_aio_request_error('GetOperationsByCursor')
+    async def get_operations_by_cursor(self, request:
+        'GetOperationsByCursorRequest') ->'GetOperationsByCursorResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetOperationsByCursorRequest())
+        response_coro = self._stub.GetOperationsByCursor(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetOperationsByCursor')
+        return protobuf_to_dataclass(response, GetOperationsByCursorResponse)
+
+
 class OperationsStreamService(BaseService):
     """//PortfolioStream — стрим обновлений портфеля"""
     _protobuf = operations_pb2
     _protobuf_grpc = operations_pb2_grpc
     _protobuf_stub = _protobuf_grpc.OperationsStreamServiceStub
 
+    @handle_request_error_gen('PortfolioStream')
     def portfolio_stream(self, request: 'PortfolioStreamRequest') ->Iterable[
         'PortfolioStreamResponse']:
         for response in self._stub.PortfolioStream(request=
@@ -104,12 +215,37 @@ class OperationsStreamService(BaseService):
             PortfolioStreamRequest()), metadata=self._metadata):
             yield protobuf_to_dataclass(response, PortfolioStreamResponse)
 
+    @handle_request_error_gen('PositionsStream')
     def positions_stream(self, request: 'PositionsStreamRequest') ->Iterable[
         'PositionsStreamResponse']:
         for response in self._stub.PositionsStream(request=
             dataclass_to_protobuf(request, self._protobuf.
             PositionsStreamRequest()), metadata=self._metadata):
             yield protobuf_to_dataclass(response, PositionsStreamResponse)
+
+
+class AsyncOperationsStreamService(BaseService):
+    _protobuf = operations_pb2
+    _protobuf_grpc = operations_pb2_grpc
+    _protobuf_stub = _protobuf_grpc.OperationsStreamServiceStub
+
+    @handle_aio_request_error_gen('PortfolioStream')
+    async def portfolio_stream(self, request: 'PortfolioStreamRequest'
+        ) ->AsyncIterable['PortfolioStreamResponse']:
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            PortfolioStreamRequest())
+        async for response in self._stub.PortfolioStream(request=
+            protobuf_request, metadata=self._metadata):(yield
+            protobuf_to_dataclass(response, PortfolioStreamResponse))
+
+    @handle_aio_request_error_gen('PositionsStream')
+    async def positions_stream(self, request: 'PositionsStreamRequest'
+        ) ->AsyncIterable['PositionsStreamResponse']:
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            PositionsStreamRequest())
+        async for response in self._stub.PositionsStream(request=
+            protobuf_request, metadata=self._metadata):(yield
+            protobuf_to_dataclass(response, PositionsStreamResponse))
 
 
 @dataclass

@@ -6,6 +6,7 @@ from typing import List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import handle_aio_request_error, handle_request_error
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import stoporders_pb2, stoporders_pb2_grpc
 from tinkoff.invest.grpc.common import (
@@ -14,7 +15,11 @@ from tinkoff.invest.grpc.common import (
     Quotation,
     ResponseMetadata,
 )
-from tinkoff.invest.logging import get_tracking_id_from_call, log_request
+from tinkoff.invest.logging import (
+    get_tracking_id_from_call,
+    get_tracking_id_from_coro,
+    log_request,
+)
 
 
 class StopOrdersService(BaseService):
@@ -23,6 +28,7 @@ class StopOrdersService(BaseService):
     _protobuf_grpc = stoporders_pb2_grpc
     _protobuf_stub = _protobuf_grpc.StopOrdersServiceStub
 
+    @handle_request_error('PostStopOrder')
     def post_stop_order(self, request: 'PostStopOrderRequest'
         ) ->'PostStopOrderResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -32,6 +38,7 @@ class StopOrdersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'PostStopOrder')
         return protobuf_to_dataclass(response, PostStopOrderResponse)
 
+    @handle_request_error('GetStopOrders')
     def get_stop_orders(self, request: 'GetStopOrdersRequest'
         ) ->'GetStopOrdersResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -41,6 +48,7 @@ class StopOrdersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetStopOrders')
         return protobuf_to_dataclass(response, GetStopOrdersResponse)
 
+    @handle_request_error('CancelStopOrder')
     def cancel_stop_order(self, request: 'CancelStopOrderRequest'
         ) ->'CancelStopOrderResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -48,6 +56,49 @@ class StopOrdersService(BaseService):
         response, call = self._stub.CancelStopOrder.with_call(request=
             protobuf_request, metadata=self._metadata)
         log_request(get_tracking_id_from_call(call), 'CancelStopOrder')
+        return protobuf_to_dataclass(response, CancelStopOrderResponse)
+
+
+class AsyncStopOrdersService(BaseService):
+    """//PostStopOrder — выставить стоп-заявку"""
+    _protobuf = stoporders_pb2
+    _protobuf_grpc = stoporders_pb2_grpc
+    _protobuf_stub = _protobuf_grpc.StopOrdersServiceStub
+
+    @handle_aio_request_error('PostStopOrder')
+    async def post_stop_order(self, request: 'PostStopOrderRequest'
+        ) ->'PostStopOrderResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            PostStopOrderRequest())
+        response_coro = self._stub.PostStopOrder(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'PostStopOrder')
+        return protobuf_to_dataclass(response, PostStopOrderResponse)
+
+    @handle_aio_request_error('GetStopOrders')
+    async def get_stop_orders(self, request: 'GetStopOrdersRequest'
+        ) ->'GetStopOrdersResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetStopOrdersRequest())
+        response_coro = self._stub.GetStopOrders(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetStopOrders')
+        return protobuf_to_dataclass(response, GetStopOrdersResponse)
+
+    @handle_aio_request_error('CancelStopOrder')
+    async def cancel_stop_order(self, request: 'CancelStopOrderRequest'
+        ) ->'CancelStopOrderResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            CancelStopOrderRequest())
+        response_coro = self._stub.CancelStopOrder(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'CancelStopOrder')
         return protobuf_to_dataclass(response, CancelStopOrderResponse)
 
 

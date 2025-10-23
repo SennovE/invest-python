@@ -6,10 +6,15 @@ from typing import List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import handle_aio_request_error, handle_request_error
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import signals_pb2, signals_pb2_grpc
 from tinkoff.invest.grpc.common import Page, PageResponse, Quotation
-from tinkoff.invest.logging import get_tracking_id_from_call, log_request
+from tinkoff.invest.logging import (
+    get_tracking_id_from_call,
+    get_tracking_id_from_coro,
+    log_request,
+)
 
 
 class SignalService(BaseService):
@@ -18,6 +23,7 @@ class SignalService(BaseService):
     _protobuf_grpc = signals_pb2_grpc
     _protobuf_stub = _protobuf_grpc.SignalServiceStub
 
+    @handle_request_error('GetStrategies')
     def get_strategies(self, request: 'GetStrategiesRequest'
         ) ->'GetStrategiesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -27,12 +33,44 @@ class SignalService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetStrategies')
         return protobuf_to_dataclass(response, GetStrategiesResponse)
 
+    @handle_request_error('GetSignals')
     def get_signals(self, request: 'GetSignalsRequest') ->'GetSignalsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             GetSignalsRequest())
         response, call = self._stub.GetSignals.with_call(request=
             protobuf_request, metadata=self._metadata)
         log_request(get_tracking_id_from_call(call), 'GetSignals')
+        return protobuf_to_dataclass(response, GetSignalsResponse)
+
+
+class AsyncSignalService(BaseService):
+    """//GetStrategies — стратегии"""
+    _protobuf = signals_pb2
+    _protobuf_grpc = signals_pb2_grpc
+    _protobuf_stub = _protobuf_grpc.SignalServiceStub
+
+    @handle_aio_request_error('GetStrategies')
+    async def get_strategies(self, request: 'GetStrategiesRequest'
+        ) ->'GetStrategiesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetStrategiesRequest())
+        response_coro = self._stub.GetStrategies(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetStrategies')
+        return protobuf_to_dataclass(response, GetStrategiesResponse)
+
+    @handle_aio_request_error('GetSignals')
+    async def get_signals(self, request: 'GetSignalsRequest'
+        ) ->'GetSignalsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetSignalsRequest())
+        response_coro = self._stub.GetSignals(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetSignals')
         return protobuf_to_dataclass(response, GetSignalsResponse)
 
 

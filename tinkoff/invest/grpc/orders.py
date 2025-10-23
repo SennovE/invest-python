@@ -1,11 +1,17 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
-from typing import Iterable, List, Optional
+from typing import AsyncIterable, Iterable, List, Optional
 
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import (
+    handle_aio_request_error,
+    handle_aio_request_error_gen,
+    handle_request_error,
+    handle_request_error_gen,
+)
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import orders_pb2, orders_pb2_grpc
 from tinkoff.invest.grpc.common import (
@@ -17,7 +23,11 @@ from tinkoff.invest.grpc.common import (
     ResponseMetadata,
     ResultSubscriptionStatus,
 )
-from tinkoff.invest.logging import get_tracking_id_from_call, log_request
+from tinkoff.invest.logging import (
+    get_tracking_id_from_call,
+    get_tracking_id_from_coro,
+    log_request,
+)
 
 
 class OrdersStreamService(BaseService):
@@ -26,6 +36,7 @@ class OrdersStreamService(BaseService):
     _protobuf_grpc = orders_pb2_grpc
     _protobuf_stub = _protobuf_grpc.OrdersStreamServiceStub
 
+    @handle_request_error_gen('TradesStream')
     def trades_stream(self, request: 'TradesStreamRequest') ->Iterable[
         'TradesStreamResponse']:
         for response in self._stub.TradesStream(request=
@@ -33,12 +44,37 @@ class OrdersStreamService(BaseService):
             TradesStreamRequest()), metadata=self._metadata):
             yield protobuf_to_dataclass(response, TradesStreamResponse)
 
+    @handle_request_error_gen('OrderStateStream')
     def order_state_stream(self, request: 'OrderStateStreamRequest'
         ) ->Iterable['OrderStateStreamResponse']:
         for response in self._stub.OrderStateStream(request=
             dataclass_to_protobuf(request, self._protobuf.
             OrderStateStreamRequest()), metadata=self._metadata):
             yield protobuf_to_dataclass(response, OrderStateStreamResponse)
+
+
+class AsyncOrdersStreamService(BaseService):
+    _protobuf = orders_pb2
+    _protobuf_grpc = orders_pb2_grpc
+    _protobuf_stub = _protobuf_grpc.OrdersStreamServiceStub
+
+    @handle_aio_request_error_gen('TradesStream')
+    async def trades_stream(self, request: 'TradesStreamRequest'
+        ) ->AsyncIterable['TradesStreamResponse']:
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            TradesStreamRequest())
+        async for response in self._stub.TradesStream(request=
+            protobuf_request, metadata=self._metadata):(yield
+            protobuf_to_dataclass(response, TradesStreamResponse))
+
+    @handle_aio_request_error_gen('OrderStateStream')
+    async def order_state_stream(self, request: 'OrderStateStreamRequest'
+        ) ->AsyncIterable['OrderStateStreamResponse']:
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            OrderStateStreamRequest())
+        async for response in self._stub.OrderStateStream(request=
+            protobuf_request, metadata=self._metadata):(yield
+            protobuf_to_dataclass(response, OrderStateStreamResponse))
 
 
 class OrdersService(BaseService):
@@ -49,6 +85,7 @@ class OrdersService(BaseService):
     _protobuf_grpc = orders_pb2_grpc
     _protobuf_stub = _protobuf_grpc.OrdersServiceStub
 
+    @handle_request_error('PostOrder')
     def post_order(self, request: 'PostOrderRequest') ->'PostOrderResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             PostOrderRequest())
@@ -57,6 +94,7 @@ class OrdersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'PostOrder')
         return protobuf_to_dataclass(response, PostOrderResponse)
 
+    @handle_request_error('PostOrderAsync')
     def post_order_async(self, request: 'PostOrderAsyncRequest'
         ) ->'PostOrderAsyncResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -66,6 +104,7 @@ class OrdersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'PostOrderAsync')
         return protobuf_to_dataclass(response, PostOrderAsyncResponse)
 
+    @handle_request_error('CancelOrder')
     def cancel_order(self, request: 'CancelOrderRequest'
         ) ->'CancelOrderResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -75,6 +114,7 @@ class OrdersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'CancelOrder')
         return protobuf_to_dataclass(response, CancelOrderResponse)
 
+    @handle_request_error('GetOrderState')
     def get_order_state(self, request: 'GetOrderStateRequest') ->'OrderState':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             GetOrderStateRequest())
@@ -83,6 +123,7 @@ class OrdersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetOrderState')
         return protobuf_to_dataclass(response, OrderState)
 
+    @handle_request_error('GetOrders')
     def get_orders(self, request: 'GetOrdersRequest') ->'GetOrdersResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             GetOrdersRequest())
@@ -91,6 +132,7 @@ class OrdersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetOrders')
         return protobuf_to_dataclass(response, GetOrdersResponse)
 
+    @handle_request_error('ReplaceOrder')
     def replace_order(self, request: 'ReplaceOrderRequest'
         ) ->'PostOrderResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -100,6 +142,7 @@ class OrdersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'ReplaceOrder')
         return protobuf_to_dataclass(response, PostOrderResponse)
 
+    @handle_request_error('GetMaxLots')
     def get_max_lots(self, request: 'GetMaxLotsRequest'
         ) ->'GetMaxLotsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -109,6 +152,7 @@ class OrdersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetMaxLots')
         return protobuf_to_dataclass(response, GetMaxLotsResponse)
 
+    @handle_request_error('GetOrderPrice')
     def get_order_price(self, request: 'GetOrderPriceRequest'
         ) ->'GetOrderPriceResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -116,6 +160,109 @@ class OrdersService(BaseService):
         response, call = self._stub.GetOrderPrice.with_call(request=
             protobuf_request, metadata=self._metadata)
         log_request(get_tracking_id_from_call(call), 'GetOrderPrice')
+        return protobuf_to_dataclass(response, GetOrderPriceResponse)
+
+
+class AsyncOrdersService(BaseService):
+    """//PostOrder — выставить заявку"""
+    _protobuf = orders_pb2
+    _protobuf_grpc = orders_pb2_grpc
+    _protobuf_stub = _protobuf_grpc.OrdersServiceStub
+
+    @handle_aio_request_error('PostOrder')
+    async def post_order(self, request: 'PostOrderRequest'
+        ) ->'PostOrderResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            PostOrderRequest())
+        response_coro = self._stub.PostOrder(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'PostOrder'
+            )
+        return protobuf_to_dataclass(response, PostOrderResponse)
+
+    @handle_aio_request_error('PostOrderAsync')
+    async def post_order_async(self, request: 'PostOrderAsyncRequest'
+        ) ->'PostOrderAsyncResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            PostOrderAsyncRequest())
+        response_coro = self._stub.PostOrderAsync(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'PostOrderAsync')
+        return protobuf_to_dataclass(response, PostOrderAsyncResponse)
+
+    @handle_aio_request_error('CancelOrder')
+    async def cancel_order(self, request: 'CancelOrderRequest'
+        ) ->'CancelOrderResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            CancelOrderRequest())
+        response_coro = self._stub.CancelOrder(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'CancelOrder')
+        return protobuf_to_dataclass(response, CancelOrderResponse)
+
+    @handle_aio_request_error('GetOrderState')
+    async def get_order_state(self, request: 'GetOrderStateRequest'
+        ) ->'OrderState':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetOrderStateRequest())
+        response_coro = self._stub.GetOrderState(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetOrderState')
+        return protobuf_to_dataclass(response, OrderState)
+
+    @handle_aio_request_error('GetOrders')
+    async def get_orders(self, request: 'GetOrdersRequest'
+        ) ->'GetOrdersResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetOrdersRequest())
+        response_coro = self._stub.GetOrders(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'GetOrders'
+            )
+        return protobuf_to_dataclass(response, GetOrdersResponse)
+
+    @handle_aio_request_error('ReplaceOrder')
+    async def replace_order(self, request: 'ReplaceOrderRequest'
+        ) ->'PostOrderResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            ReplaceOrderRequest())
+        response_coro = self._stub.ReplaceOrder(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'ReplaceOrder')
+        return protobuf_to_dataclass(response, PostOrderResponse)
+
+    @handle_aio_request_error('GetMaxLots')
+    async def get_max_lots(self, request: 'GetMaxLotsRequest'
+        ) ->'GetMaxLotsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetMaxLotsRequest())
+        response_coro = self._stub.GetMaxLots(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetMaxLots')
+        return protobuf_to_dataclass(response, GetMaxLotsResponse)
+
+    @handle_aio_request_error('GetOrderPrice')
+    async def get_order_price(self, request: 'GetOrderPriceRequest'
+        ) ->'GetOrderPriceResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetOrderPriceRequest())
+        response_coro = self._stub.GetOrderPrice(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetOrderPrice')
         return protobuf_to_dataclass(response, GetOrderPriceResponse)
 
 

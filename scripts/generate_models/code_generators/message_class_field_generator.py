@@ -4,11 +4,15 @@ from ast import AnnAssign, Call, Constant, Load, Name, Store, Subscript, alias, 
 from iprotopy.annotation_generator import AnnotationGenerator
 from iprotopy.domestic_importer import DomesticImporter
 from iprotopy.imports import ImportFrom
+from iprotopy.message_class_generator import (
+    MessageClassGenerator as DefaultMessageClassGenerator,
+)
+from iprotopy.one_of_generator import OneOfGenerator
 from iprotopy.type_mapper import TypeMapper
 from proto_schema_parser import Field, FieldCardinality
 
 
-class ExtendedClassFieldGenerator:
+class ClassFieldGenerator:
     def __init__(self, importer: DomesticImporter, type_mapper: TypeMapper):
         self._importer = importer
         self._type_mapper = type_mapper
@@ -81,3 +85,13 @@ class ExtendedClassFieldGenerator:
         field_type = self._annotation_generator.process_annotation(field.type)
         annotation = Name(id=field_type, ctx=Load())
         return self._construct_field(field, annotation, is_optional)
+
+
+class MessageClassGenerator(DefaultMessageClassGenerator):
+    def __init__(self, importer: DomesticImporter, type_mapper: TypeMapper):
+        self._importer = importer
+        self._type_mapper = type_mapper
+        self._class_field_generator = ClassFieldGenerator(
+            self._importer, self._type_mapper
+        )
+        self._one_of_generator = OneOfGenerator(self._class_field_generator)

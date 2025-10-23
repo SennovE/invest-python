@@ -4,7 +4,7 @@ import grpc
 from grpc.aio import ClientInterceptor
 
 from tinkoff.invest.channels import create_channel
-from tinkoff.invest.grpc.utils.grpc_services import Services
+from tinkoff.invest.grpc.utils.grpc_services import AsyncServices, Services
 from tinkoff.invest.typedefs import ChannelArgumentType
 
 __all__ = ("Client", "AsyncClient")
@@ -58,4 +58,58 @@ class Client:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._channel.__exit__(exc_type, exc_val, exc_tb)
+        return False
+
+
+class AsyncClient:
+    """Async client.
+
+    ```python
+    import asyncio
+    import os
+
+    from tinkoff.invest import AsyncClient
+
+    TOKEN = os.environ["INVEST_TOKEN"]
+
+
+    async def main():
+        async with AsyncClient(TOKEN) as client:
+            print(await client.users.get_accounts())
+
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+    """
+
+    def __init__(
+        self,
+        token: str,
+        *,
+        target: Optional[str] = None,
+        sandbox_token: Optional[str] = None,
+        options: Optional[ChannelArgumentType] = None,
+        app_name: Optional[str] = None,
+        interceptors: Optional[List[ClientInterceptor]] = None,
+    ):
+        self._token = token
+        self._sandbox_token = sandbox_token
+        self._options = options
+        self._app_name = app_name
+        self._channel = create_channel(
+            target=target, force_async=True, options=options, interceptors=interceptors
+        )
+
+    async def __aenter__(self) -> AsyncServices:
+        channel = await self._channel.__aenter__()
+        return AsyncServices(
+            channel,
+            token=self._token,
+            sandbox_token=self._sandbox_token,
+            app_name=self._app_name,
+        )
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self._channel.__aexit__(exc_type, exc_val, exc_tb)
         return False

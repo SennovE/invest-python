@@ -6,10 +6,15 @@ from typing import List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import handle_aio_request_error, handle_request_error
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import users_pb2, users_pb2_grpc
 from tinkoff.invest.grpc.common import MoneyValue, Quotation
-from tinkoff.invest.logging import get_tracking_id_from_call, log_request
+from tinkoff.invest.logging import (
+    get_tracking_id_from_call,
+    get_tracking_id_from_coro,
+    log_request,
+)
 
 
 class UsersService(BaseService):
@@ -19,6 +24,7 @@ class UsersService(BaseService):
     _protobuf_grpc = users_pb2_grpc
     _protobuf_stub = _protobuf_grpc.UsersServiceStub
 
+    @handle_request_error('GetAccounts')
     def get_accounts(self, request: 'GetAccountsRequest'
         ) ->'GetAccountsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -28,6 +34,7 @@ class UsersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetAccounts')
         return protobuf_to_dataclass(response, GetAccountsResponse)
 
+    @handle_request_error('GetMarginAttributes')
     def get_margin_attributes(self, request: 'GetMarginAttributesRequest'
         ) ->'GetMarginAttributesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -37,6 +44,7 @@ class UsersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetMarginAttributes')
         return protobuf_to_dataclass(response, GetMarginAttributesResponse)
 
+    @handle_request_error('GetUserTariff')
     def get_user_tariff(self, request: 'GetUserTariffRequest'
         ) ->'GetUserTariffResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -46,12 +54,66 @@ class UsersService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetUserTariff')
         return protobuf_to_dataclass(response, GetUserTariffResponse)
 
+    @handle_request_error('GetInfo')
     def get_info(self, request: 'GetInfoRequest') ->'GetInfoResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             GetInfoRequest())
         response, call = self._stub.GetInfo.with_call(request=
             protobuf_request, metadata=self._metadata)
         log_request(get_tracking_id_from_call(call), 'GetInfo')
+        return protobuf_to_dataclass(response, GetInfoResponse)
+
+
+class AsyncUsersService(BaseService):
+    """//GetAccounts — счета пользователя"""
+    _protobuf = users_pb2
+    _protobuf_grpc = users_pb2_grpc
+    _protobuf_stub = _protobuf_grpc.UsersServiceStub
+
+    @handle_aio_request_error('GetAccounts')
+    async def get_accounts(self, request: 'GetAccountsRequest'
+        ) ->'GetAccountsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetAccountsRequest())
+        response_coro = self._stub.GetAccounts(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetAccounts')
+        return protobuf_to_dataclass(response, GetAccountsResponse)
+
+    @handle_aio_request_error('GetMarginAttributes')
+    async def get_margin_attributes(self, request: 'GetMarginAttributesRequest'
+        ) ->'GetMarginAttributesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetMarginAttributesRequest())
+        response_coro = self._stub.GetMarginAttributes(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetMarginAttributes')
+        return protobuf_to_dataclass(response, GetMarginAttributesResponse)
+
+    @handle_aio_request_error('GetUserTariff')
+    async def get_user_tariff(self, request: 'GetUserTariffRequest'
+        ) ->'GetUserTariffResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetUserTariffRequest())
+        response_coro = self._stub.GetUserTariff(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetUserTariff')
+        return protobuf_to_dataclass(response, GetUserTariffResponse)
+
+    @handle_aio_request_error('GetInfo')
+    async def get_info(self, request: 'GetInfoRequest') ->'GetInfoResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetInfoRequest())
+        response_coro = self._stub.GetInfo(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'GetInfo')
         return protobuf_to_dataclass(response, GetInfoResponse)
 
 

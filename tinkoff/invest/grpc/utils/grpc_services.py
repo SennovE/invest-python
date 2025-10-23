@@ -1,13 +1,16 @@
+import asyncio
 import logging
-from dataclasses import asdict, dataclass, fields, make_dataclass
+from dataclasses import dataclass, fields
 from datetime import datetime
-from typing import Generator, Optional
+from typing import AsyncGenerator, Generator, Optional
 
 import grpc
 
-from tinkoff.invest.grpc.common import Quotation as RawQuotation
-from tinkoff.invest.grpc.instruments import InstrumentsService
+from tinkoff.invest.grpc.common import Quotation as BaseQuotation
+from tinkoff.invest.grpc.instruments import AsyncInstrumentsService, InstrumentsService
 from tinkoff.invest.grpc.marketdata import (
+    AsyncMarketDataService,
+    AsyncMarketDataStreamService,
     CandleInterval,
     CandleSource,
     GetCandlesRequest,
@@ -16,12 +19,32 @@ from tinkoff.invest.grpc.marketdata import (
     MarketDataService,
     MarketDataStreamService,
 )
-from tinkoff.invest.grpc.operations import OperationsService, OperationsStreamService
-from tinkoff.invest.grpc.orders import OrdersService, OrdersStreamService
-from tinkoff.invest.grpc.sandbox import SandboxService
-from tinkoff.invest.grpc.signals import SignalService
-from tinkoff.invest.grpc.stoporders import StopOrdersService
-from tinkoff.invest.grpc.users import UsersService
+from tinkoff.invest.grpc.operations import (
+    AsyncOperationsService,
+    AsyncOperationsStreamService,
+    OperationsService,
+    OperationsStreamService,
+)
+from tinkoff.invest.grpc.orders import (
+    AsyncOrdersService,
+    AsyncOrdersStreamService,
+    CancelOrderRequest,
+    GetOrdersRequest,
+    OrdersService,
+    OrdersStreamService,
+)
+from tinkoff.invest.grpc.sandbox import AsyncSandboxService, SandboxService
+from tinkoff.invest.grpc.signals import AsyncSignalService, SignalService
+from tinkoff.invest.grpc.stoporders import (
+    AsyncStopOrdersService,
+    CancelStopOrderRequest,
+    GetStopOrdersRequest,
+    StopOrdersService,
+)
+from tinkoff.invest.grpc.users import AsyncUsersService, UsersService
+from tinkoff.invest.market_data_stream.async_market_data_stream_manager import (
+    AsyncMarketDataStreamManager,
+)
 from tinkoff.invest.market_data_stream.market_data_stream_manager import (
     MarketDataStreamManager,
 )
@@ -94,7 +117,7 @@ class Services:
                     if isinstance(value, int):
                         values.append(value)
                     continue
-                elif isinstance(value, RawQuotation):
+                elif isinstance(value, BaseQuotation):
                     values.append((value.units, value.nano))
                 else:
                     values.append(value)
@@ -124,8 +147,91 @@ class Services:
             previous_candles = current_candles
 
 
+class AsyncServices:
+    def __init__(
+        self,
+        channel: grpc.aio.Channel,
+        token: str,
+        sandbox_token: Optional[str] = None,
+        app_name: Optional[str] = None,
+    ) -> None:
+        metadata = get_metadata(token, app_name)
+        sandbox_metadata = get_metadata(sandbox_token or token, app_name)
+        self.instruments = AsyncInstrumentsService(channel, metadata)
+        self.market_data = AsyncMarketDataService(channel, metadata)
+        self.market_data_stream = AsyncMarketDataStreamService(channel, metadata)
+        self.operations = AsyncOperationsService(channel, metadata)
+        self.operations_stream = AsyncOperationsStreamService(channel, metadata)
+        self.orders_stream = AsyncOrdersStreamService(channel, metadata)
+        self.orders = AsyncOrdersService(channel, metadata)
+        self.users = AsyncUsersService(channel, metadata)
+        self.sandbox = AsyncSandboxService(channel, sandbox_metadata)
+        self.stop_orders = AsyncStopOrdersService(channel, metadata)
+        self.signals = AsyncSignalService(channel, metadata)
+
+    def create_market_data_stream(self) -> AsyncMarketDataStreamManager:
+        return AsyncMarketDataStreamManager(market_data_stream=self.market_data_stream)
+
+    async def cancel_all_orders(self, account_id: AccountId) -> None:
+        orders_service: OrdersService = self.orders
+        stop_orders_service: StopOrdersService = self.stop_orders
+
+        orders_response = await orders_service.get_orders(GetOrdersRequest(account_id=account_id))
+        await asyncio.gather(
+            *[
+                orders_service.cancel_order(
+                    CancelOrderRequest(
+                        account_id=account_id, order_id=order.order_id
+                    )
+                )
+                for order in orders_response.orders
+            ]
+        )
+
+        stop_orders_response = await stop_orders_service.get_stop_orders(
+            GetStopOrdersRequest(account_id=account_id)
+        )
+        await asyncio.gather(
+            *[
+                stop_orders_service.cancel_stop_order(
+                    CancelStopOrderRequest(
+                        account_id=account_id, stop_order_id=stop_order.stop_order_id
+                    )
+                )
+                for stop_order in stop_orders_response.stop_orders
+            ]
+        )
+
+    async def get_all_candles(
+        self,
+        *,
+        from_: datetime,
+        to: Optional[datetime] = None,
+        interval: CandleInterval = CandleInterval(0),
+        figi: str = "",
+        instrument_id: str = "",
+        candle_source_type: Optional[CandleSource] = None,
+    ) -> AsyncGenerator[HistoricCandle, None]:
+        to = to or now()
+
+        for local_from_, local_to in get_intervals(interval, from_, to):
+            candles_response = await self.market_data.get_candles(
+                GetCandlesRequest(
+                    figi=figi,
+                    interval=interval,
+                    from_=local_from_,
+                    to=local_to,
+                    instrument_id=instrument_id,
+                    candle_source_type=candle_source_type,
+                )
+            )
+            for candle in candles_response.candles:
+                yield candle
+
+
+
 @dataclass(eq=False, repr=True)
-class Quotation(RawQuotation):
+class Quotation(BaseQuotation):
     def __init__(self, units: int, nano: int):
         max_quotation_nano = 1_000_000_000
         self.units = units + nano // max_quotation_nano

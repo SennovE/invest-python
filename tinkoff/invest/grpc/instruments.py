@@ -6,6 +6,7 @@ from typing import List, Optional
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import handle_aio_request_error, handle_request_error
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import instruments_pb2, instruments_pb2_grpc
 from tinkoff.invest.grpc.common import (
@@ -19,7 +20,11 @@ from tinkoff.invest.grpc.common import (
     RealExchange,
     SecurityTradingStatus,
 )
-from tinkoff.invest.logging import get_tracking_id_from_call, log_request
+from tinkoff.invest.logging import (
+    get_tracking_id_from_call,
+    get_tracking_id_from_coro,
+    log_request,
+)
 
 
 class InstrumentsService(BaseService):
@@ -30,6 +35,7 @@ class InstrumentsService(BaseService):
     _protobuf_grpc = instruments_pb2_grpc
     _protobuf_stub = _protobuf_grpc.InstrumentsServiceStub
 
+    @handle_request_error('TradingSchedules')
     def trading_schedules(self, request: 'TradingSchedulesRequest'
         ) ->'TradingSchedulesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -39,6 +45,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'TradingSchedules')
         return protobuf_to_dataclass(response, TradingSchedulesResponse)
 
+    @handle_request_error('BondBy')
     def bond_by(self, request: 'InstrumentRequest') ->'BondResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentRequest())
@@ -47,6 +54,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'BondBy')
         return protobuf_to_dataclass(response, BondResponse)
 
+    @handle_request_error('Bonds')
     def bonds(self, request: 'InstrumentsRequest') ->'BondsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentsRequest())
@@ -55,6 +63,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'Bonds')
         return protobuf_to_dataclass(response, BondsResponse)
 
+    @handle_request_error('GetBondCoupons')
     def get_bond_coupons(self, request: 'GetBondCouponsRequest'
         ) ->'GetBondCouponsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -64,6 +73,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetBondCoupons')
         return protobuf_to_dataclass(response, GetBondCouponsResponse)
 
+    @handle_request_error('GetBondEvents')
     def get_bond_events(self, request: 'GetBondEventsRequest'
         ) ->'GetBondEventsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -73,6 +83,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetBondEvents')
         return protobuf_to_dataclass(response, GetBondEventsResponse)
 
+    @handle_request_error('CurrencyBy')
     def currency_by(self, request: 'InstrumentRequest') ->'CurrencyResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentRequest())
@@ -81,6 +92,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'CurrencyBy')
         return protobuf_to_dataclass(response, CurrencyResponse)
 
+    @handle_request_error('Currencies')
     def currencies(self, request: 'InstrumentsRequest') ->'CurrenciesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentsRequest())
@@ -89,6 +101,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'Currencies')
         return protobuf_to_dataclass(response, CurrenciesResponse)
 
+    @handle_request_error('EtfBy')
     def etf_by(self, request: 'InstrumentRequest') ->'EtfResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentRequest())
@@ -97,6 +110,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'EtfBy')
         return protobuf_to_dataclass(response, EtfResponse)
 
+    @handle_request_error('Etfs')
     def etfs(self, request: 'InstrumentsRequest') ->'EtfsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentsRequest())
@@ -105,6 +119,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'Etfs')
         return protobuf_to_dataclass(response, EtfsResponse)
 
+    @handle_request_error('FutureBy')
     def future_by(self, request: 'InstrumentRequest') ->'FutureResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentRequest())
@@ -113,6 +128,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'FutureBy')
         return protobuf_to_dataclass(response, FutureResponse)
 
+    @handle_request_error('Futures')
     def futures(self, request: 'InstrumentsRequest') ->'FuturesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentsRequest())
@@ -121,6 +137,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'Futures')
         return protobuf_to_dataclass(response, FuturesResponse)
 
+    @handle_request_error('OptionBy')
     def option_by(self, request: 'InstrumentRequest') ->'OptionResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentRequest())
@@ -129,6 +146,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'OptionBy')
         return protobuf_to_dataclass(response, OptionResponse)
 
+    @handle_request_error('Options')
     def options(self, request: 'InstrumentsRequest') ->'OptionsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentsRequest())
@@ -137,6 +155,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'Options')
         return protobuf_to_dataclass(response, OptionsResponse)
 
+    @handle_request_error('OptionsBy')
     def options_by(self, request: 'FilterOptionsRequest') ->'OptionsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             FilterOptionsRequest())
@@ -145,6 +164,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'OptionsBy')
         return protobuf_to_dataclass(response, OptionsResponse)
 
+    @handle_request_error('ShareBy')
     def share_by(self, request: 'InstrumentRequest') ->'ShareResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentRequest())
@@ -153,6 +173,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'ShareBy')
         return protobuf_to_dataclass(response, ShareResponse)
 
+    @handle_request_error('Shares')
     def shares(self, request: 'InstrumentsRequest') ->'SharesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             InstrumentsRequest())
@@ -161,6 +182,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'Shares')
         return protobuf_to_dataclass(response, SharesResponse)
 
+    @handle_request_error('Indicatives')
     def indicatives(self, request: 'IndicativesRequest'
         ) ->'IndicativesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -170,6 +192,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'Indicatives')
         return protobuf_to_dataclass(response, IndicativesResponse)
 
+    @handle_request_error('GetAccruedInterests')
     def get_accrued_interests(self, request: 'GetAccruedInterestsRequest'
         ) ->'GetAccruedInterestsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -179,6 +202,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetAccruedInterests')
         return protobuf_to_dataclass(response, GetAccruedInterestsResponse)
 
+    @handle_request_error('GetFuturesMargin')
     def get_futures_margin(self, request: 'GetFuturesMarginRequest'
         ) ->'GetFuturesMarginResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -188,6 +212,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetFuturesMargin')
         return protobuf_to_dataclass(response, GetFuturesMarginResponse)
 
+    @handle_request_error('GetInstrumentBy')
     def get_instrument_by(self, request: 'InstrumentRequest'
         ) ->'InstrumentResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -197,6 +222,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetInstrumentBy')
         return protobuf_to_dataclass(response, InstrumentResponse)
 
+    @handle_request_error('GetDividends')
     def get_dividends(self, request: 'GetDividendsRequest'
         ) ->'GetDividendsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -206,6 +232,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetDividends')
         return protobuf_to_dataclass(response, GetDividendsResponse)
 
+    @handle_request_error('GetAssetBy')
     def get_asset_by(self, request: 'AssetRequest') ->'AssetResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             AssetRequest())
@@ -214,6 +241,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetAssetBy')
         return protobuf_to_dataclass(response, AssetResponse)
 
+    @handle_request_error('GetAssets')
     def get_assets(self, request: 'AssetsRequest') ->'AssetsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             AssetsRequest())
@@ -222,6 +250,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetAssets')
         return protobuf_to_dataclass(response, AssetsResponse)
 
+    @handle_request_error('GetFavorites')
     def get_favorites(self, request: 'GetFavoritesRequest'
         ) ->'GetFavoritesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -231,6 +260,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetFavorites')
         return protobuf_to_dataclass(response, GetFavoritesResponse)
 
+    @handle_request_error('EditFavorites')
     def edit_favorites(self, request: 'EditFavoritesRequest'
         ) ->'EditFavoritesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -240,6 +270,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'EditFavorites')
         return protobuf_to_dataclass(response, EditFavoritesResponse)
 
+    @handle_request_error('CreateFavoriteGroup')
     def create_favorite_group(self, request: 'CreateFavoriteGroupRequest'
         ) ->'CreateFavoriteGroupResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -249,6 +280,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'CreateFavoriteGroup')
         return protobuf_to_dataclass(response, CreateFavoriteGroupResponse)
 
+    @handle_request_error('DeleteFavoriteGroup')
     def delete_favorite_group(self, request: 'DeleteFavoriteGroupRequest'
         ) ->'DeleteFavoriteGroupResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -258,6 +290,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'DeleteFavoriteGroup')
         return protobuf_to_dataclass(response, DeleteFavoriteGroupResponse)
 
+    @handle_request_error('GetFavoriteGroups')
     def get_favorite_groups(self, request: 'GetFavoriteGroupsRequest'
         ) ->'GetFavoriteGroupsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -267,6 +300,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetFavoriteGroups')
         return protobuf_to_dataclass(response, GetFavoriteGroupsResponse)
 
+    @handle_request_error('GetCountries')
     def get_countries(self, request: 'GetCountriesRequest'
         ) ->'GetCountriesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -276,6 +310,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetCountries')
         return protobuf_to_dataclass(response, GetCountriesResponse)
 
+    @handle_request_error('FindInstrument')
     def find_instrument(self, request: 'FindInstrumentRequest'
         ) ->'FindInstrumentResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -285,6 +320,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'FindInstrument')
         return protobuf_to_dataclass(response, FindInstrumentResponse)
 
+    @handle_request_error('GetBrands')
     def get_brands(self, request: 'GetBrandsRequest') ->'GetBrandsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             GetBrandsRequest())
@@ -293,6 +329,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetBrands')
         return protobuf_to_dataclass(response, GetBrandsResponse)
 
+    @handle_request_error('GetBrandBy')
     def get_brand_by(self, request: 'GetBrandRequest') ->'Brand':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             GetBrandRequest())
@@ -301,6 +338,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetBrandBy')
         return protobuf_to_dataclass(response, Brand)
 
+    @handle_request_error('GetAssetFundamentals')
     def get_asset_fundamentals(self, request: 'GetAssetFundamentalsRequest'
         ) ->'GetAssetFundamentalsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -310,6 +348,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetAssetFundamentals')
         return protobuf_to_dataclass(response, GetAssetFundamentalsResponse)
 
+    @handle_request_error('GetAssetReports')
     def get_asset_reports(self, request: 'GetAssetReportsRequest'
         ) ->'GetAssetReportsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -319,6 +358,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetAssetReports')
         return protobuf_to_dataclass(response, GetAssetReportsResponse)
 
+    @handle_request_error('GetConsensusForecasts')
     def get_consensus_forecasts(self, request: 'GetConsensusForecastsRequest'
         ) ->'GetConsensusForecastsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -328,6 +368,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetConsensusForecasts')
         return protobuf_to_dataclass(response, GetConsensusForecastsResponse)
 
+    @handle_request_error('GetForecastBy')
     def get_forecast_by(self, request: 'GetForecastRequest'
         ) ->'GetForecastResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -337,6 +378,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetForecastBy')
         return protobuf_to_dataclass(response, GetForecastResponse)
 
+    @handle_request_error('GetRiskRates')
     def get_risk_rates(self, request: 'RiskRatesRequest'
         ) ->'RiskRatesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -346,6 +388,7 @@ class InstrumentsService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetRiskRates')
         return protobuf_to_dataclass(response, RiskRatesResponse)
 
+    @handle_request_error('GetInsiderDeals')
     def get_insider_deals(self, request: 'GetInsiderDealsRequest'
         ) ->'GetInsiderDealsResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -353,6 +396,446 @@ class InstrumentsService(BaseService):
         response, call = self._stub.GetInsiderDeals.with_call(request=
             protobuf_request, metadata=self._metadata)
         log_request(get_tracking_id_from_call(call), 'GetInsiderDeals')
+        return protobuf_to_dataclass(response, GetInsiderDealsResponse)
+
+
+class AsyncInstrumentsService(BaseService):
+    """//TradingSchedules — расписания торговых площадок"""
+    _protobuf = instruments_pb2
+    _protobuf_grpc = instruments_pb2_grpc
+    _protobuf_stub = _protobuf_grpc.InstrumentsServiceStub
+
+    @handle_aio_request_error('TradingSchedules')
+    async def trading_schedules(self, request: 'TradingSchedulesRequest'
+        ) ->'TradingSchedulesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            TradingSchedulesRequest())
+        response_coro = self._stub.TradingSchedules(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'TradingSchedules')
+        return protobuf_to_dataclass(response, TradingSchedulesResponse)
+
+    @handle_aio_request_error('BondBy')
+    async def bond_by(self, request: 'InstrumentRequest') ->'BondResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentRequest())
+        response_coro = self._stub.BondBy(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'BondBy')
+        return protobuf_to_dataclass(response, BondResponse)
+
+    @handle_aio_request_error('Bonds')
+    async def bonds(self, request: 'InstrumentsRequest') ->'BondsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentsRequest())
+        response_coro = self._stub.Bonds(request=protobuf_request, metadata
+            =self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'Bonds')
+        return protobuf_to_dataclass(response, BondsResponse)
+
+    @handle_aio_request_error('GetBondCoupons')
+    async def get_bond_coupons(self, request: 'GetBondCouponsRequest'
+        ) ->'GetBondCouponsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetBondCouponsRequest())
+        response_coro = self._stub.GetBondCoupons(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetBondCoupons')
+        return protobuf_to_dataclass(response, GetBondCouponsResponse)
+
+    @handle_aio_request_error('GetBondEvents')
+    async def get_bond_events(self, request: 'GetBondEventsRequest'
+        ) ->'GetBondEventsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetBondEventsRequest())
+        response_coro = self._stub.GetBondEvents(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetBondEvents')
+        return protobuf_to_dataclass(response, GetBondEventsResponse)
+
+    @handle_aio_request_error('CurrencyBy')
+    async def currency_by(self, request: 'InstrumentRequest'
+        ) ->'CurrencyResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentRequest())
+        response_coro = self._stub.CurrencyBy(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'CurrencyBy')
+        return protobuf_to_dataclass(response, CurrencyResponse)
+
+    @handle_aio_request_error('Currencies')
+    async def currencies(self, request: 'InstrumentsRequest'
+        ) ->'CurrenciesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentsRequest())
+        response_coro = self._stub.Currencies(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'Currencies')
+        return protobuf_to_dataclass(response, CurrenciesResponse)
+
+    @handle_aio_request_error('EtfBy')
+    async def etf_by(self, request: 'InstrumentRequest') ->'EtfResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentRequest())
+        response_coro = self._stub.EtfBy(request=protobuf_request, metadata
+            =self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'EtfBy')
+        return protobuf_to_dataclass(response, EtfResponse)
+
+    @handle_aio_request_error('Etfs')
+    async def etfs(self, request: 'InstrumentsRequest') ->'EtfsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentsRequest())
+        response_coro = self._stub.Etfs(request=protobuf_request, metadata=
+            self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'Etfs')
+        return protobuf_to_dataclass(response, EtfsResponse)
+
+    @handle_aio_request_error('FutureBy')
+    async def future_by(self, request: 'InstrumentRequest') ->'FutureResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentRequest())
+        response_coro = self._stub.FutureBy(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'FutureBy')
+        return protobuf_to_dataclass(response, FutureResponse)
+
+    @handle_aio_request_error('Futures')
+    async def futures(self, request: 'InstrumentsRequest') ->'FuturesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentsRequest())
+        response_coro = self._stub.Futures(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'Futures')
+        return protobuf_to_dataclass(response, FuturesResponse)
+
+    @handle_aio_request_error('OptionBy')
+    async def option_by(self, request: 'InstrumentRequest') ->'OptionResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentRequest())
+        response_coro = self._stub.OptionBy(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'OptionBy')
+        return protobuf_to_dataclass(response, OptionResponse)
+
+    @handle_aio_request_error('Options')
+    async def options(self, request: 'InstrumentsRequest') ->'OptionsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentsRequest())
+        response_coro = self._stub.Options(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'Options')
+        return protobuf_to_dataclass(response, OptionsResponse)
+
+    @handle_aio_request_error('OptionsBy')
+    async def options_by(self, request: 'FilterOptionsRequest'
+        ) ->'OptionsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            FilterOptionsRequest())
+        response_coro = self._stub.OptionsBy(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'OptionsBy'
+            )
+        return protobuf_to_dataclass(response, OptionsResponse)
+
+    @handle_aio_request_error('ShareBy')
+    async def share_by(self, request: 'InstrumentRequest') ->'ShareResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentRequest())
+        response_coro = self._stub.ShareBy(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'ShareBy')
+        return protobuf_to_dataclass(response, ShareResponse)
+
+    @handle_aio_request_error('Shares')
+    async def shares(self, request: 'InstrumentsRequest') ->'SharesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentsRequest())
+        response_coro = self._stub.Shares(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'Shares')
+        return protobuf_to_dataclass(response, SharesResponse)
+
+    @handle_aio_request_error('Indicatives')
+    async def indicatives(self, request: 'IndicativesRequest'
+        ) ->'IndicativesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            IndicativesRequest())
+        response_coro = self._stub.Indicatives(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'Indicatives')
+        return protobuf_to_dataclass(response, IndicativesResponse)
+
+    @handle_aio_request_error('GetAccruedInterests')
+    async def get_accrued_interests(self, request: 'GetAccruedInterestsRequest'
+        ) ->'GetAccruedInterestsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetAccruedInterestsRequest())
+        response_coro = self._stub.GetAccruedInterests(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetAccruedInterests')
+        return protobuf_to_dataclass(response, GetAccruedInterestsResponse)
+
+    @handle_aio_request_error('GetFuturesMargin')
+    async def get_futures_margin(self, request: 'GetFuturesMarginRequest'
+        ) ->'GetFuturesMarginResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetFuturesMarginRequest())
+        response_coro = self._stub.GetFuturesMargin(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetFuturesMargin')
+        return protobuf_to_dataclass(response, GetFuturesMarginResponse)
+
+    @handle_aio_request_error('GetInstrumentBy')
+    async def get_instrument_by(self, request: 'InstrumentRequest'
+        ) ->'InstrumentResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            InstrumentRequest())
+        response_coro = self._stub.GetInstrumentBy(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetInstrumentBy')
+        return protobuf_to_dataclass(response, InstrumentResponse)
+
+    @handle_aio_request_error('GetDividends')
+    async def get_dividends(self, request: 'GetDividendsRequest'
+        ) ->'GetDividendsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetDividendsRequest())
+        response_coro = self._stub.GetDividends(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetDividends')
+        return protobuf_to_dataclass(response, GetDividendsResponse)
+
+    @handle_aio_request_error('GetAssetBy')
+    async def get_asset_by(self, request: 'AssetRequest') ->'AssetResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            AssetRequest())
+        response_coro = self._stub.GetAssetBy(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetAssetBy')
+        return protobuf_to_dataclass(response, AssetResponse)
+
+    @handle_aio_request_error('GetAssets')
+    async def get_assets(self, request: 'AssetsRequest') ->'AssetsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            AssetsRequest())
+        response_coro = self._stub.GetAssets(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'GetAssets'
+            )
+        return protobuf_to_dataclass(response, AssetsResponse)
+
+    @handle_aio_request_error('GetFavorites')
+    async def get_favorites(self, request: 'GetFavoritesRequest'
+        ) ->'GetFavoritesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetFavoritesRequest())
+        response_coro = self._stub.GetFavorites(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetFavorites')
+        return protobuf_to_dataclass(response, GetFavoritesResponse)
+
+    @handle_aio_request_error('EditFavorites')
+    async def edit_favorites(self, request: 'EditFavoritesRequest'
+        ) ->'EditFavoritesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            EditFavoritesRequest())
+        response_coro = self._stub.EditFavorites(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'EditFavorites')
+        return protobuf_to_dataclass(response, EditFavoritesResponse)
+
+    @handle_aio_request_error('CreateFavoriteGroup')
+    async def create_favorite_group(self, request: 'CreateFavoriteGroupRequest'
+        ) ->'CreateFavoriteGroupResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            CreateFavoriteGroupRequest())
+        response_coro = self._stub.CreateFavoriteGroup(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'CreateFavoriteGroup')
+        return protobuf_to_dataclass(response, CreateFavoriteGroupResponse)
+
+    @handle_aio_request_error('DeleteFavoriteGroup')
+    async def delete_favorite_group(self, request: 'DeleteFavoriteGroupRequest'
+        ) ->'DeleteFavoriteGroupResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            DeleteFavoriteGroupRequest())
+        response_coro = self._stub.DeleteFavoriteGroup(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'DeleteFavoriteGroup')
+        return protobuf_to_dataclass(response, DeleteFavoriteGroupResponse)
+
+    @handle_aio_request_error('GetFavoriteGroups')
+    async def get_favorite_groups(self, request: 'GetFavoriteGroupsRequest'
+        ) ->'GetFavoriteGroupsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetFavoriteGroupsRequest())
+        response_coro = self._stub.GetFavoriteGroups(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetFavoriteGroups')
+        return protobuf_to_dataclass(response, GetFavoriteGroupsResponse)
+
+    @handle_aio_request_error('GetCountries')
+    async def get_countries(self, request: 'GetCountriesRequest'
+        ) ->'GetCountriesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetCountriesRequest())
+        response_coro = self._stub.GetCountries(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetCountries')
+        return protobuf_to_dataclass(response, GetCountriesResponse)
+
+    @handle_aio_request_error('FindInstrument')
+    async def find_instrument(self, request: 'FindInstrumentRequest'
+        ) ->'FindInstrumentResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            FindInstrumentRequest())
+        response_coro = self._stub.FindInstrument(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'FindInstrument')
+        return protobuf_to_dataclass(response, FindInstrumentResponse)
+
+    @handle_aio_request_error('GetBrands')
+    async def get_brands(self, request: 'GetBrandsRequest'
+        ) ->'GetBrandsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetBrandsRequest())
+        response_coro = self._stub.GetBrands(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro), 'GetBrands'
+            )
+        return protobuf_to_dataclass(response, GetBrandsResponse)
+
+    @handle_aio_request_error('GetBrandBy')
+    async def get_brand_by(self, request: 'GetBrandRequest') ->'Brand':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetBrandRequest())
+        response_coro = self._stub.GetBrandBy(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetBrandBy')
+        return protobuf_to_dataclass(response, Brand)
+
+    @handle_aio_request_error('GetAssetFundamentals')
+    async def get_asset_fundamentals(self, request:
+        'GetAssetFundamentalsRequest') ->'GetAssetFundamentalsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetAssetFundamentalsRequest())
+        response_coro = self._stub.GetAssetFundamentals(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetAssetFundamentals')
+        return protobuf_to_dataclass(response, GetAssetFundamentalsResponse)
+
+    @handle_aio_request_error('GetAssetReports')
+    async def get_asset_reports(self, request: 'GetAssetReportsRequest'
+        ) ->'GetAssetReportsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetAssetReportsRequest())
+        response_coro = self._stub.GetAssetReports(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetAssetReports')
+        return protobuf_to_dataclass(response, GetAssetReportsResponse)
+
+    @handle_aio_request_error('GetConsensusForecasts')
+    async def get_consensus_forecasts(self, request:
+        'GetConsensusForecastsRequest') ->'GetConsensusForecastsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetConsensusForecastsRequest())
+        response_coro = self._stub.GetConsensusForecasts(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetConsensusForecasts')
+        return protobuf_to_dataclass(response, GetConsensusForecastsResponse)
+
+    @handle_aio_request_error('GetForecastBy')
+    async def get_forecast_by(self, request: 'GetForecastRequest'
+        ) ->'GetForecastResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetForecastRequest())
+        response_coro = self._stub.GetForecastBy(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetForecastBy')
+        return protobuf_to_dataclass(response, GetForecastResponse)
+
+    @handle_aio_request_error('GetRiskRates')
+    async def get_risk_rates(self, request: 'RiskRatesRequest'
+        ) ->'RiskRatesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            RiskRatesRequest())
+        response_coro = self._stub.GetRiskRates(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetRiskRates')
+        return protobuf_to_dataclass(response, RiskRatesResponse)
+
+    @handle_aio_request_error('GetInsiderDeals')
+    async def get_insider_deals(self, request: 'GetInsiderDealsRequest'
+        ) ->'GetInsiderDealsResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetInsiderDealsRequest())
+        response_coro = self._stub.GetInsiderDeals(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetInsiderDeals')
         return protobuf_to_dataclass(response, GetInsiderDealsResponse)
 
 

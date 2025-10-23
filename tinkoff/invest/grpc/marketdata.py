@@ -1,11 +1,17 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
-from typing import Iterable, List, Optional
+from typing import AsyncIterable, Iterable, List, Optional
 
 from iprotopy import dataclass_to_protobuf, protobuf_to_dataclass
 
 from base_service import BaseService
+from tinkoff.invest._errors import (
+    handle_aio_request_error,
+    handle_aio_request_error_gen,
+    handle_request_error,
+    handle_request_error_gen,
+)
 from tinkoff.invest._grpc_helpers import message_field
 from tinkoff.invest.grpc import marketdata_pb2, marketdata_pb2_grpc
 from tinkoff.invest.grpc.common import (
@@ -16,7 +22,11 @@ from tinkoff.invest.grpc.common import (
     Quotation,
     SecurityTradingStatus,
 )
-from tinkoff.invest.logging import get_tracking_id_from_call, log_request
+from tinkoff.invest.logging import (
+    get_tracking_id_from_call,
+    get_tracking_id_from_coro,
+    log_request,
+)
 
 
 class MarketDataService(BaseService):
@@ -25,6 +35,7 @@ class MarketDataService(BaseService):
     _protobuf_grpc = marketdata_pb2_grpc
     _protobuf_stub = _protobuf_grpc.MarketDataServiceStub
 
+    @handle_request_error('GetCandles')
     def get_candles(self, request: 'GetCandlesRequest') ->'GetCandlesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
             GetCandlesRequest())
@@ -33,6 +44,7 @@ class MarketDataService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetCandles')
         return protobuf_to_dataclass(response, GetCandlesResponse)
 
+    @handle_request_error('GetLastPrices')
     def get_last_prices(self, request: 'GetLastPricesRequest'
         ) ->'GetLastPricesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -42,6 +54,7 @@ class MarketDataService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetLastPrices')
         return protobuf_to_dataclass(response, GetLastPricesResponse)
 
+    @handle_request_error('GetOrderBook')
     def get_order_book(self, request: 'GetOrderBookRequest'
         ) ->'GetOrderBookResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -51,6 +64,7 @@ class MarketDataService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetOrderBook')
         return protobuf_to_dataclass(response, GetOrderBookResponse)
 
+    @handle_request_error('GetTradingStatus')
     def get_trading_status(self, request: 'GetTradingStatusRequest'
         ) ->'GetTradingStatusResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -60,6 +74,7 @@ class MarketDataService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetTradingStatus')
         return protobuf_to_dataclass(response, GetTradingStatusResponse)
 
+    @handle_request_error('GetTradingStatuses')
     def get_trading_statuses(self, request: 'GetTradingStatusesRequest'
         ) ->'GetTradingStatusesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -69,6 +84,7 @@ class MarketDataService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetTradingStatuses')
         return protobuf_to_dataclass(response, GetTradingStatusesResponse)
 
+    @handle_request_error('GetLastTrades')
     def get_last_trades(self, request: 'GetLastTradesRequest'
         ) ->'GetLastTradesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -78,6 +94,7 @@ class MarketDataService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetLastTrades')
         return protobuf_to_dataclass(response, GetLastTradesResponse)
 
+    @handle_request_error('GetClosePrices')
     def get_close_prices(self, request: 'GetClosePricesRequest'
         ) ->'GetClosePricesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -87,6 +104,7 @@ class MarketDataService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetClosePrices')
         return protobuf_to_dataclass(response, GetClosePricesResponse)
 
+    @handle_request_error('GetTechAnalysis')
     def get_tech_analysis(self, request: 'GetTechAnalysisRequest'
         ) ->'GetTechAnalysisResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -96,6 +114,7 @@ class MarketDataService(BaseService):
         log_request(get_tracking_id_from_call(call), 'GetTechAnalysis')
         return protobuf_to_dataclass(response, GetTechAnalysisResponse)
 
+    @handle_request_error('GetMarketValues')
     def get_market_values(self, request: 'GetMarketValuesRequest'
         ) ->'GetMarketValuesResponse':
         protobuf_request = dataclass_to_protobuf(request, self._protobuf.
@@ -106,12 +125,128 @@ class MarketDataService(BaseService):
         return protobuf_to_dataclass(response, GetMarketValuesResponse)
 
 
+class AsyncMarketDataService(BaseService):
+    """//GetCandles — исторические свечи по инструменту"""
+    _protobuf = marketdata_pb2
+    _protobuf_grpc = marketdata_pb2_grpc
+    _protobuf_stub = _protobuf_grpc.MarketDataServiceStub
+
+    @handle_aio_request_error('GetCandles')
+    async def get_candles(self, request: 'GetCandlesRequest'
+        ) ->'GetCandlesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetCandlesRequest())
+        response_coro = self._stub.GetCandles(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetCandles')
+        return protobuf_to_dataclass(response, GetCandlesResponse)
+
+    @handle_aio_request_error('GetLastPrices')
+    async def get_last_prices(self, request: 'GetLastPricesRequest'
+        ) ->'GetLastPricesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetLastPricesRequest())
+        response_coro = self._stub.GetLastPrices(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetLastPrices')
+        return protobuf_to_dataclass(response, GetLastPricesResponse)
+
+    @handle_aio_request_error('GetOrderBook')
+    async def get_order_book(self, request: 'GetOrderBookRequest'
+        ) ->'GetOrderBookResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetOrderBookRequest())
+        response_coro = self._stub.GetOrderBook(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetOrderBook')
+        return protobuf_to_dataclass(response, GetOrderBookResponse)
+
+    @handle_aio_request_error('GetTradingStatus')
+    async def get_trading_status(self, request: 'GetTradingStatusRequest'
+        ) ->'GetTradingStatusResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetTradingStatusRequest())
+        response_coro = self._stub.GetTradingStatus(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetTradingStatus')
+        return protobuf_to_dataclass(response, GetTradingStatusResponse)
+
+    @handle_aio_request_error('GetTradingStatuses')
+    async def get_trading_statuses(self, request: 'GetTradingStatusesRequest'
+        ) ->'GetTradingStatusesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetTradingStatusesRequest())
+        response_coro = self._stub.GetTradingStatuses(request=
+            protobuf_request, metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetTradingStatuses')
+        return protobuf_to_dataclass(response, GetTradingStatusesResponse)
+
+    @handle_aio_request_error('GetLastTrades')
+    async def get_last_trades(self, request: 'GetLastTradesRequest'
+        ) ->'GetLastTradesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetLastTradesRequest())
+        response_coro = self._stub.GetLastTrades(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetLastTrades')
+        return protobuf_to_dataclass(response, GetLastTradesResponse)
+
+    @handle_aio_request_error('GetClosePrices')
+    async def get_close_prices(self, request: 'GetClosePricesRequest'
+        ) ->'GetClosePricesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetClosePricesRequest())
+        response_coro = self._stub.GetClosePrices(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetClosePrices')
+        return protobuf_to_dataclass(response, GetClosePricesResponse)
+
+    @handle_aio_request_error('GetTechAnalysis')
+    async def get_tech_analysis(self, request: 'GetTechAnalysisRequest'
+        ) ->'GetTechAnalysisResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetTechAnalysisRequest())
+        response_coro = self._stub.GetTechAnalysis(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetTechAnalysis')
+        return protobuf_to_dataclass(response, GetTechAnalysisResponse)
+
+    @handle_aio_request_error('GetMarketValues')
+    async def get_market_values(self, request: 'GetMarketValuesRequest'
+        ) ->'GetMarketValuesResponse':
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            GetMarketValuesRequest())
+        response_coro = self._stub.GetMarketValues(request=protobuf_request,
+            metadata=self._metadata)
+        response = await response_coro
+        log_request(await get_tracking_id_from_coro(response_coro),
+            'GetMarketValues')
+        return protobuf_to_dataclass(response, GetMarketValuesResponse)
+
+
 class MarketDataStreamService(BaseService):
     """//MarketDataStream — bidirectional стрим предоставления биржевой информации"""
     _protobuf = marketdata_pb2
     _protobuf_grpc = marketdata_pb2_grpc
     _protobuf_stub = _protobuf_grpc.MarketDataStreamServiceStub
 
+    @handle_request_error_gen('MarketDataStream')
     def market_data_stream(self, requests: Iterable['MarketDataRequest']
         ) ->Iterable['MarketDataResponse']:
         for response in self._stub.MarketDataStream(request_iterator=(
@@ -119,12 +254,39 @@ class MarketDataStreamService(BaseService):
             ()) for request in requests), metadata=self._metadata):
             yield protobuf_to_dataclass(response, MarketDataResponse)
 
+    @handle_request_error_gen('MarketDataServerSideStream')
     def market_data_server_side_stream(self, request:
         'MarketDataServerSideStreamRequest') ->Iterable['MarketDataResponse']:
         for response in self._stub.MarketDataServerSideStream(request=
             dataclass_to_protobuf(request, self._protobuf.
             MarketDataServerSideStreamRequest()), metadata=self._metadata):
             yield protobuf_to_dataclass(response, MarketDataResponse)
+
+
+class AsyncMarketDataStreamService(BaseService):
+    _protobuf = marketdata_pb2
+    _protobuf_grpc = marketdata_pb2_grpc
+    _protobuf_stub = _protobuf_grpc.MarketDataStreamServiceStub
+
+    @handle_aio_request_error_gen('MarketDataStream')
+    async def market_data_stream(self, request_iterator: AsyncIterable[
+        'MarketDataRequest']) ->AsyncIterable['MarketDataResponse']:
+        protobuf_request_iterator = (dataclass_to_protobuf(request, self.
+            _protobuf.MarketDataRequest()) async for request in
+            request_iterator)
+        async for response in self._stub.MarketDataStream(request_iterator=
+            protobuf_request_iterator, metadata=self._metadata):(yield
+            protobuf_to_dataclass(response, MarketDataResponse))
+
+    @handle_aio_request_error_gen('MarketDataServerSideStream')
+    async def market_data_server_side_stream(self, request:
+        'MarketDataServerSideStreamRequest') ->AsyncIterable[
+        'MarketDataResponse']:
+        protobuf_request = dataclass_to_protobuf(request, self._protobuf.
+            MarketDataServerSideStreamRequest())
+        async for response in self._stub.MarketDataServerSideStream(request
+            =protobuf_request, metadata=self._metadata):(yield
+            protobuf_to_dataclass(response, MarketDataResponse))
 
 
 @dataclass
